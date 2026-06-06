@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="usuario.css">
+    <script>
+        // Protección de ruta inmediata antes de renderizar la página
+        if (!sessionStorage.getItem('username')) {
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+
+<body>
+
+    <!-- aqi el usuario elegira sus preferencias  -->
+    <header class="header">
+
+        <div class="logo">
+            <a href="index.html" style="text-decoration: none; color: inherit;">
+                <h1>Piterest proyecto</h1>
+            </a><!-- nombre momentaneo hasta elegir el nombre final  -->
+        </div>
+
+        <div class="settings">
+
+            <button class="settings-btn" onclick="toggleMenu()">Configuración</button>
+
+            <div class="settings-menu" id="settingsMenu">
+
+                <label>
+                    <input type="checkbox">
+                    Mostrar contenido para adultos
+                </label>
+
+                <label>
+                    <input type="checkbox">
+                    Perfil privado
+                </label>
+                
+                <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 10px 0;">
+                
+                <button onclick="cerrarSesion()" style="width: 100%; padding: 8px; background-color: #ef4444; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+                    Cerrar sesión
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
