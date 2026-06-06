@@ -115,3 +115,26 @@
         </div>
 
     </main>
+
+    <script>
+
+        // funcion temporal para probar ir al detalle de la publicacion
+        function irADetalle() {
+            window.location.href = "detalle.html";
+        }
+
+        // filtrado por categorias (basico por ahora)
+        const botonesCategoria = document.querySelectorAll('.categoria-btn');
+        
+        botonesCategoria.forEach(boton => {
+            boton.addEventListener('click', function() {
+                // aqui se implementaria la logica de filtrado
+                console.log('Categoria seleccionada:', this.textContent);
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>
