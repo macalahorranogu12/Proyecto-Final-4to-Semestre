@@ -1,0 +1,102 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(to bottom right, #0d0d0d, #1a001f);
+    min-height: 100vh;
+    color: white;
+}
+
+/* header con logo, buscador y navegacion */
+.header {
+    width: 100%;
+    padding: 20px 40px;
+    background-color: #111;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #7b2cbf;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo h1 {
+    color: #c77dff;
+    font-size: 28px;
+}
+
+.buscador input {
+    width: 400px;
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: 1px solid #7b2cbf;
+    background-color: #222;
+    color: white;
+    outline: none;
+    font-size: 14px;
+}
+
+.buscador input:focus {
+    border-color: #c77dff;
+    box-shadow: 0 0 10px #c77dff;
+}
+
+.nav {
+    display: flex;
+    gap: 15px;
+}
+
+.nav a {
+    color: #d8b4fe;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.nav a:hover {
+    background-color: #7b2cbf;
+    color: white;
+}
+
+/* barra de categorias horizontal */
+.categorias {
+    padding: 20px 40px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    background-color: #151515;
+    border-bottom: 1px solid #7b2cbf;
+}
+
+.categoria-btn {
+    padding: 10px 20px;
+    background-color: #222;
+    color: #d8b4fe;
+    border: 1px solid #7b2cbf;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.categoria-btn:hover {
+    background-color: #7b2cbf;
+    color: white;
+    box-shadow: 0 0 10px #c77dff;
+}
+
+/* contenido principal con mosaico tipo pinterest */
+.main-content {
+    padding: 30px 40px;
+}
+
+.galeria {
+    columns: 4 250px;
+    column-gap: 15px;
+}
+
