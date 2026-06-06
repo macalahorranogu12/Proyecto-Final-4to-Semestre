@@ -100,3 +100,80 @@ body {
     column-gap: 15px;
 }
 
+.post {
+    margin-bottom: 15px;
+    break-inside: avoid;
+    background-color: #1b1b1b;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid #7b2cbf;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.post:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px #9d4edd;
+}
+
+.post img {
+    width: 100%;
+    display: block;
+}
+
+.post-info {
+    padding: 15px;
+}
+
+.post-info h3 {
+    color: #c77dff;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.post-info p {
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* responsivo para pantallas mas pequeñas */
+@media (max-width: 1024px) {
+    .galeria {
+        columns: 3 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 20px;
+    }
+    
+    .buscador input {
+        width: 100%;
+    }
+    
+    .nav {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .galeria {
+        columns: 2 250px;
+    }
+    
+    .categorias {
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .galeria {
+        columns: 1 250px;
+    }
+    
+    .logo h1 {
+        font-size: 22px;
+    }
+}
