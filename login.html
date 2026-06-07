@@ -4,40 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio - Piterest proyecto</title>
-    <link rel="stylesheet" href="index.css">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="login.css">
 </head>
 
 <body>
 
-    <!-- header principal con busqueda y categorias -->
-    <header class="header">
+    <!-- formulario de login simple -->
+    <div class="contenedor">
 
-        <div class="logo">
-            <h1>Piterest proyecto</h1>
+        <div class="login-box">
+
+            <h1>Iniciar Sesión</h1>
+            <p>Bienvenido de nuevo</p>
+
+            <form>
+
+                <div class="campo">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" placeholder="ejemplo@gmail.com" required>
+                </div>
+
+                <div class="campo">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+                </div>
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox">
+                        Recordar sesión
+                    </label>
+                </div>
+
+                <button type="submit">Ingresar</button>
+
+            </form>
+
+            <div class="register-link">
+                <p>¿No tienes cuenta? <a href="register.html">Regístrate</a></p>
+            </div>
+
+            <div class="back-link">
+                <p><a href="index.html">Volver al inicio</a></p>
+            </div>
+
         </div>
 
-        <div class="buscador">
-            <input type="text" id="busqueda" placeholder="Buscar imágenes, ideas...">
-        </div>
+    </div>
 
-        <div class="nav">
-            <a href="login.html">Iniciar sesión</a>
-            <a href="register.html">Registrarse</a>
-        </div>
+</body>
 
-    </header>
-
-    <!-- barra de categorias para filtrar contenido -->
-    <section class="categorias">
-
-        <button class="categoria-btn">Todo</button>
-        <button class="categoria-btn">Arte</button>
-        <button class="categoria-btn">Fotografía</button>
-        <button class="categoria-btn">Diseño</button>
-        <button class="categoria-btn">Naturaleza</button>
-        <button class="categoria-btn">Tecnología</button>
-        <button class="categoria-btn">Comida</button>
-        <button class="categoria-btn">Viajes</button>
-
-    </section>
+</html>
