@@ -1,0 +1,122 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.contenedor {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to bottom right, #0d0d0d, #1a001f);
+}
+
+.login-box {
+    width: 400px;
+    background-color: #151515;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 25px #8a2be2;
+}
+
+.login-box h1 {
+    text-align: center;
+    color: #c77dff;
+    margin-bottom: 10px;
+}
+
+.login-box p {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #cccccc;
+}
+
+.campo {
+    margin-bottom: 20px;
+}
+
+.campo label {
+    display: block;
+    margin-bottom: 8px;
+    color: #d8b4fe;
+}
+
+.campo input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #7b2cbf;
+    background-color: #222;
+    color: white;
+    outline: none;
+}
+
+.campo input:focus {
+    border-color: #c77dff;
+    box-shadow: 0 0 10px #c77dff;
+}
+
+.checkbox {
+    margin-bottom: 20px;
+}
+
+.checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #d8b4fe;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: #7b2cbf;
+    color: white;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #9d4edd;
+    box-shadow: 0 0 15px #c77dff;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.register-link p {
+    color: #aaa;
+}
+
+.register-link a {
+    color: #c77dff;
+    text-decoration: none;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.back-link p {
+    color: #888;
+}
+
+.back-link a {
+    color: #9d4edd;
+    text-decoration: none;
+}
+
+.back-link a:hover {
+    text-decoration: underline;
+}
