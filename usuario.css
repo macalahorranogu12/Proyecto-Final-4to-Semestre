@@ -1,0 +1,113 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(to bottom right, #0d0d0d, #1a001f);
+    min-height: 100vh;
+    color: white;
+}
+
+.header {
+    width: 100%;
+    padding: 20px 40px;
+    background-color: #111;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #7b2cbf;
+}
+
+.logo h1 {
+    color: #c77dff;
+}
+
+.settings-btn {
+    background-color: #7b2cbf;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.settings-btn:hover {
+    background-color: #9d4edd;
+    box-shadow: 0 0 10px #c77dff;
+}
+
+.settings {
+    position: relative;
+}
+
+.settings-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50px;
+    width: 250px;
+    background-color: #1b1b1b;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #7b2cbf;
+    box-shadow: 0 0 15px #7b2cbf;
+}
+
+.settings-menu label {
+    display: block;
+    margin-bottom: 12px;
+}
+
+.perfil {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.foto-perfil img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 4px solid #9d4edd;
+    box-shadow: 0 0 20px #9d4edd;
+}
+
+.publicaciones {
+    padding: 30px;
+}
+
+.publicaciones h2 {
+    margin-bottom: 20px;
+    color: white;
+}
+
+.galeria {
+    columns: 4 250px;
+    column-gap: 15px;
+}
+
+.post {
+    margin-bottom: 15px;
+    break-inside: avoid;
+    background-color: #1b1b1b;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid #7b2cbf;
+    transition: 0.3s;
+}
+
+.post:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px #9d4edd;
+}
+
+.post img {
+    width: 100%;
+    display: block;
+}
+
+.placeholder-post {
+    padding: 40px 20px;
+    text-align: center;
+    color: #aaa;
+}
