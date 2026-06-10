@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle - Piterest proyecto</title>
+    <link rel="stylesheet" href="detalle.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <a href="index.html" style="text-decoration: none; color: inherit;">
+                <h1>Piterest proyecto</h1>
+            </a>
+        </div>
+        <div class="nav">
+            <a href="index.html">← Volver al inicio</a>
+        </div>
+    </header>
+
+    <main class="detalle-container fade-in">
+        <div class="imagen-detalle slide-in-left">
+            <img id="detalle-img" src="" alt="Imagen en detalle">
+        </div>
+
+        <div class="info-detalle slide-in-right">
+            <div class="post-header">
+                <h2 id="detalle-titulo">Cargando...</h2>
+                <button class="guardar-btn">Guardar</button>
+            </div>
+
+            <div class="usuario-info">
+                <img id="detalle-avatar" src="avatar.png" alt="Foto de usuario" class="avatar-usuario" width="45" height="45">
+                <div class="usuario-texto">
+                    <p class="nombre-usuario" id="detalle-username">@usuario</p>
+                    <p class="fecha-publicacion" id="detalle-fecha">Publicado recientemente</p>
+                </div>
+            </div>
+
+            <span id="detalle-categoria" class="detalle-cat"></span>
+
+            <p class="descripcion" id="detalle-descripcion"></p>
+
+            <hr class="divisor">
+
+            <div class="comentarios-seccion">
+                <h3>Comentarios</h3>
+
+                <div class="comentarios-lista" id="comentarios-lista">
+                    <p style="color:#666; font-size:14px; text-align:center; padding:20px 0;">
+                        Sé el primero en comentar.
+                    </p>
+                </div>
+
+                <div class="agregar-comentario">
+                    <img src="avatar.png" alt="Tu avatar" class="avatar-comentario" id="avatar-comentario-input">
+                    <input type="text" id="input-comentario" placeholder="Añade un comentario..." class="input-comentario">
+                    <button class="enviar-btn" onclick="enviarComentario()">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Leer el post guardado en sessionStorage al hacer clic
+        document.addEventListener('DOMContentLoaded', () => {
+            const raw = sessionStorage.getItem('postDetalle');
+
+            if (!raw) {
+                // No hay datos: redirigir al inicio
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const post = JSON.parse(raw);
+
+            // Imagen principal
+            const imgEl = document.getElementById('detalle-img');
+            imgEl.src = post.image_url;
+            imgEl.alt = post.title;
+
+            // Título de la página
+            document.title = post.title + ' - Piterest proyecto';
+
+            // Info del post
+            document.getElementById('detalle-titulo').textContent = post.title;
+            document.getElementById('detalle-username').textContent = '@' + post.username;
+
+            // Descripción
+            const descEl = document.getElementById('detalle-descripcion');
+            descEl.textContent = post.description || '';
+            descEl.style.display = post.description ? 'block' : 'none';
+
+            // Categoría
+            const catEl = document.getElementById('detalle-categoria');
+            if (post.category) {
+                catEl.textContent = post.category;
+                catEl.style.display = 'inline-block';
+            }
+
+            // Fecha
+            if (post.created_at) {
+                const fecha = new Date(post.created_at);
+                const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('detalle-fecha').textContent =
+                    'Publicado el ' + fecha.toLocaleDateString('es-ES', opciones);
+            }
+
+            // Cargar avatar del autor desde la API
+            cargarAvatarAutor(post.username);
+
+            // Cargar avatar propio si hay sesión
+            const myUser = sessionStorage.getItem('username');
+            if (myUser) {
+                cargarAvatarPropio(myUser);
+            }
+        });
+
+        async function cargarAvatarAutor(username) {
+            try {
+                const res = await fetch('/profile/' + encodeURIComponent(username));
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.avatar_url) {
+                    document.getElementById('detalle-avatar').src = data.avatar_url + '?t=' + Date.now();
+                }
+            } catch (e) { /* no crítico */ }
+        }
+
+        async function cargarAvatarPropio(username) {
+            try {
+                const res = await fetch('/profile/' + encodeURIComponent(username));
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.avatar_url) {
+                    document.getElementById('avatar-comentario-input').src = data.avatar_url + '?t=' + Date.now();
+                }
+            } catch (e) { /* no crítico */ }
+        }
+
+        // Comentarios locales (en sesión, sin backend por ahora)
+        const comentariosLocales = [];
+
+        function enviarComentario() {
+            const input = document.getElementById('input-comentario');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            const username = sessionStorage.getItem('username') || 'Anónimo';
+            comentariosLocales.push({ username, texto });
+            input.value = '';
+            renderComentarios();
+        }
+
+        // Enviar con Enter
+        document.getElementById('input-comentario').addEventListener('keydown', e => {
+            if (e.key === 'Enter') enviarComentario();
+        });
+
+        function renderComentarios() {
+            const lista = document.getElementById('comentarios-lista');
+            if (comentariosLocales.length === 0) {
+                lista.innerHTML = '<p style="color:#666;font-size:14px;text-align:center;padding:20px 0;">Sé el primero en comentar.</p>';
+                return;
+            }
+            lista.innerHTML = comentariosLocales.map(c => `
+                <div class="comentario fade-in-up">
+                    <img src="avatar.png" alt="Avatar" class="avatar-comentario">
+                    <div class="comentario-contenido">
+                        <strong>@${c.username}</strong>
+                        <p>${c.texto}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
