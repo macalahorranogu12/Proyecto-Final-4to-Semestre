@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - Piterest proyecto</title>
+    <meta name="description" content="Descubre y comparte imágenes increíbles en Piterest, la plataforma visual definitiva.">
     <link rel="stylesheet" href="index.css">
 </head>
 
@@ -14,125 +15,343 @@
     <header class="header">
 
         <div class="logo">
-            <h1>Piterest proyecto</h1>
+            <a href="index.html" style="text-decoration: none; color: inherit;">
+                <h1>Piterest proyecto</h1>
+            </a>
         </div>
 
         <div class="buscador">
             <input type="text" id="busqueda" placeholder="Buscar imágenes, ideas...">
         </div>
 
-        <div class="nav">
+        <div class="nav" id="nav-links">
             <a href="login.html">Iniciar sesión</a>
             <a href="register.html">Registrarse</a>
         </div>
 
     </header>
- <!-- barra de categorias para filtrar contenido -->
 
- <section class="categorias">
-
-        <button class="categoria-btn">Todo</button>
-        <button class="categoria-btn">Arte</button>
-        <button class="categoria-btn">Fotografía</button>
-        <button class="categoria-btn">Diseño</button>
-        <button class="categoria-btn">Naturaleza</button>
-        <button class="categoria-btn">Tecnología</button>
-        <button class="categoria-btn">Comida</button>
-        <button class="categoria-btn">Viajes</button>
-
+    <!-- barra de categorias para filtrar contenido -->
+    <section class="categorias">
+        <button class="categoria-btn active" data-cat="Todo">Todo</button>
+        <button class="categoria-btn" data-cat="Arte">Arte</button>
+        <button class="categoria-btn" data-cat="Fotografía">Fotografía</button>
+        <button class="categoria-btn" data-cat="Diseño">Diseño</button>
+        <button class="categoria-btn" data-cat="Naturaleza">Naturaleza</button>
+        <button class="categoria-btn" data-cat="Tecnología">Tecnología</button>
+        <button class="categoria-btn" data-cat="Comida">Comida</button>
+        <button class="categoria-btn" data-cat="Viajes">Viajes</button>
     </section>
 
     <!-- mosaico principal de imagenes tipo pinterest -->
     <main class="main-content">
-
-        <div class="galeria">
-
-            <!-- estas imagenes son placeholders, despues se conectaran con S3 -->
-            <div class="post" onclick="irADetalle()">
-                <img src="https://via.placeholder.com/300x400/7b2cbf/ffffff?text=Imagen+1" alt="Publicación">
+        <div class="galeria" id="galeria-principal">
+            <!-- Las publicaciones reales se cargan por JS; estas son el fallback estático -->
+            <div class="post post-placeholder" onclick="irADetalle(this)" data-cat="Arte">
+                <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?w=500&h=600&fit=crop" alt="Arte abstracto" loading="lazy">
                 <div class="post-info">
                     <h3>Arte abstracto</h3>
                     <p>usuario1</p>
                 </div>
             </div>
-
-            <div class="post" onclick="irADetalle()">
-                <img src="https://via.placeholder.com/300x500/9d4edd/ffffff?text=Imagen+2" alt="Publicación">
+            <div class="post post-placeholder" onclick="irADetalle(this)" data-cat="Naturaleza">
+                <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&h=750&fit=crop" alt="Paisaje natural" loading="lazy">
                 <div class="post-info">
                     <h3>Paisaje natural</h3>
                     <p>usuario2</p>
                 </div>
             </div>
-
-            <div class="post" onclick="irADetalle()">
-                <img src="https://via.placeholder.com/300x350/c77dff/ffffff?text=Imagen+3" alt="Publicación">
+            <div class="post post-placeholder" onclick="irADetalle(this)" data-cat="Diseño">
+                <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=580&fit=crop" alt="Diseño moderno" loading="lazy">
                 <div class="post-info">
                     <h3>Diseño moderno</h3>
                     <p>usuario3</p>
                 </div>
             </div>
-
-            <div class="post" onclick="irADetalle()">
-                <img src="https://via.placeholder.com/300x450/7b2cbf/ffffff?text=Imagen+4" alt="Publicación">
+            <div class="post post-placeholder" onclick="irADetalle(this)" data-cat="Fotografía">
+                <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=500&h=675&fit=crop" alt="Fotografía urbana" loading="lazy">
                 <div class="post-info">
                     <h3>Fotografía urbana</h3>
                     <p>usuario4</p>
                 </div>
             </div>
-
-            <div class="post" onclick="irADetalle()">
-                <img src="https://via.placeholder.com/300x380/9d4edd/ffffff?text=Imagen+5" alt="Publicación">
+            <div class="post post-placeholder" onclick="irADetalle(this)" data-cat="Comida">
+                <img src="https://images.unsplash.com/photo-1484723091791-c0e7e53f3ea8?w=500&h=570&fit=crop" alt="Comida gourmet" loading="lazy">
                 <div class="post-info">
                     <h3>Comida gourmet</h3>
                     <p>usuario5</p>
                 </div>
             </div>
-
-            <div class="post" onclick="irADetalle()">
-                <img src="https://via.placeholder.com/300x420/c77dff/ffffff?text=Imagen+6" alt="Publicación">
+            <div class="post post-placeholder" onclick="irADetalle(this)" data-cat="Viajes">
+                <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=500&h=630&fit=crop" alt="Viajes increíbles" loading="lazy">
                 <div class="post-info">
                     <h3>Viajes increíbles</h3>
                     <p>usuario6</p>
                 </div>
             </div>
-
-            <div class="post" onclick="irADetalle()">
-                <img src="https://via.placeholder.com/300x400/7b2cbf/ffffff?text=Imagen+7" alt="Publicación">
+            <div class="post post-placeholder" onclick="irADetalle(this)" data-cat="Tecnología">
+                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&h=600&fit=crop" alt="Tecnología futurista" loading="lazy">
                 <div class="post-info">
                     <h3>Tecnología futurista</h3>
                     <p>usuario7</p>
                 </div>
             </div>
-
-            <div class="post" onclick="irADetalle()">
-                <img src="https://via.placeholder.com/300x360/9d4edd/ffffff?text=Imagen+8" alt="Publicación">
+            <div class="post post-placeholder" onclick="irADetalle(this)" data-cat="Naturaleza">
+                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&h=540&fit=crop" alt="Naturaleza salvaje" loading="lazy">
                 <div class="post-info">
                     <h3>Naturaleza salvaje</h3>
                     <p>usuario8</p>
                 </div>
             </div>
-
         </div>
-
     </main>
 
-    <script>
+    <!-- Botón flotante de publicar (solo visible si hay sesión) -->
+    <button class="fab-publicar" id="fab-publicar" title="Publicar imagen" onclick="abrirModalPublicar()">
+        <span class="fab-icon">＋</span>
+        <span class="fab-label">Publicar</span>
+    </button>
 
-        // funcion temporal para probar ir al detalle de la publicacion
-        function irADetalle() {
-            window.location.href = "detalle.html";
+    <!-- Modal para publicar imagen -->
+    <div class="modal-overlay" id="modal-publicar" onclick="cerrarModalSiFondo(event)">
+        <div class="modal-card">
+            <button class="modal-close" onclick="cerrarModalPublicar()" title="Cerrar">✕</button>
+            <h2 class="modal-title">✨ Nueva publicación</h2>
+
+            <div class="preview-zona" id="preview-zona">
+                <div class="preview-placeholder" id="preview-placeholder">
+                    <div class="preview-icon">🖼️</div>
+                    <p>Haz clic o arrastra una imagen aquí</p>
+                </div>
+                <img id="preview-img" class="preview-img" alt="Vista previa" style="display:none;">
+                <input type="file" id="input-imagen" accept="image/*" style="display:none;" onchange="previsualizarImagen(event)">
+            </div>
+
+            <div class="modal-campos">
+                <input type="text" id="pub-titulo" class="modal-input" placeholder="Título de la publicación *" maxlength="100">
+
+                <input type="text" id="pub-categoria" class="modal-input" placeholder="Categoría (ej: Arte, Viajes, tu propia...)" list="categorias-sugeridas" maxlength="50">
+                <datalist id="categorias-sugeridas">
+                    <option value="Arte">
+                    <option value="Fotografía">
+                    <option value="Diseño">
+                    <option value="Naturaleza">
+                    <option value="Tecnología">
+                    <option value="Comida">
+                    <option value="Viajes">
+                </datalist>
+
+                <textarea id="pub-descripcion" class="modal-textarea" placeholder="Descripción (opcional)" maxlength="300" rows="3"></textarea>
+
+                <div id="pub-error" class="pub-error" style="display:none;"></div>
+
+                <button class="btn-publicar-modal" id="btn-enviar-pub" onclick="enviarPublicacion()">
+                    <span id="btn-pub-texto">🚀 Publicar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = '';  // base URL vacía = mismo origen
+        let categoriaActiva = 'Todo';
+        let todosLosPosts = [];  // cache de posts reales
+
+        // ── Sesión ──────────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            const loggedUser = sessionStorage.getItem('username');
+            const navLinks = document.getElementById('nav-links');
+            if (loggedUser && navLinks) {
+                navLinks.innerHTML = `
+                    <span style="color:#ffffff;font-weight:500;margin-right:15px;">Hola, @${loggedUser}</span>
+                    <a href="usuario.html" id="nav-mi-perfil" style="margin-right:15px;text-decoration:none;color:#ffffff;font-weight:bold;">Mi Perfil</a>
+                    <a href="#" id="nav-cerrar-sesion" onclick="cerrarSesion(event)" style="color:#ef4444;font-weight:bold;text-decoration:none;">Cerrar sesión</a>
+                `;
+                document.getElementById('fab-publicar').classList.add('visible');
+            }
+            cargarPosts();
+        });
+
+        function cerrarSesion(e) {
+            e.preventDefault();
+            sessionStorage.removeItem('username');
+            window.location.reload();
         }
 
-        // filtrado por categorias (basico por ahora)
+        // ── Galería / Posts ─────────────────────────────────────────────────
+        async function cargarPosts() {
+            try {
+                const res = await fetch(`${API}/posts`);
+                if (!res.ok) throw new Error('Sin posts');
+                const posts = await res.json();
+                if (posts.length > 0) {
+                    todosLosPosts = posts;
+                    renderPosts(posts);
+                }
+            } catch (e) {
+                // Mantener los posts de placeholder si la API falla
+                todosLosPosts = [];
+            }
+        }
+
+        function renderPosts(posts) {
+            const galeria = document.getElementById('galeria-principal');
+            // Quitar placeholders
+            galeria.querySelectorAll('.post-placeholder').forEach(el => el.remove());
+
+            posts.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'post post-real';
+                div.setAttribute('data-cat', p.category || 'General');
+                div.onclick = () => irADetalle(div, p);
+                div.innerHTML = `
+                    <img src="${p.image_url}" alt="${p.title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&h=600&fit=crop'">
+                    <div class="post-info">
+                        <h3>${p.title}</h3>
+                        <p>@${p.username}</p>
+                    </div>
+                `;
+                galeria.prepend(div);
+            });
+        }
+
+        // ── Filtrado por categorías ─────────────────────────────────────────
         const botonesCategoria = document.querySelectorAll('.categoria-btn');
-        
         botonesCategoria.forEach(boton => {
-            boton.addEventListener('click', function() {
-                // aqui se implementaria la logica de filtrado
-                console.log('Categoria seleccionada:', this.textContent);
+            boton.addEventListener('click', function () {
+                botonesCategoria.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                categoriaActiva = this.getAttribute('data-cat');
+                filtrarPosts(categoriaActiva);
             });
         });
 
+        function filtrarPosts(cat) {
+            const posts = document.querySelectorAll('.post');
+            posts.forEach(post => {
+                if (cat === 'Todo' || post.getAttribute('data-cat') === cat) {
+                    post.style.display = '';
+                } else {
+                    post.style.display = 'none';
+                }
+            });
+        }
+
+        // ── Detalle ─────────────────────────────────────────────────────────
+        function irADetalle(el, postData) {
+            if (postData) sessionStorage.setItem('postDetalle', JSON.stringify(postData));
+            window.location.href = 'detalle.html';
+        }
+
+        // ── Modal publicar ──────────────────────────────────────────────────
+        function abrirModalPublicar() {
+            document.getElementById('modal-publicar').classList.add('abierto');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalPublicar() {
+            document.getElementById('modal-publicar').classList.remove('abierto');
+            document.body.style.overflow = '';
+            resetearModal();
+        }
+
+        function cerrarModalSiFondo(e) {
+            if (e.target.id === 'modal-publicar') cerrarModalPublicar();
+        }
+
+        function resetearModal() {
+            document.getElementById('pub-titulo').value = '';
+            document.getElementById('pub-categoria').value = '';
+            document.getElementById('pub-descripcion').value = '';
+            document.getElementById('input-imagen').value = '';
+            document.getElementById('preview-img').style.display = 'none';
+            document.getElementById('preview-placeholder').style.display = 'flex';
+            document.getElementById('pub-error').style.display = 'none';
+            document.getElementById('btn-pub-texto').textContent = '🚀 Publicar';
+            document.getElementById('btn-enviar-pub').disabled = false;
+        }
+
+        // Clic en zona de preview abre el selector de archivo
+        document.getElementById('preview-zona').addEventListener('click', () => {
+            document.getElementById('input-imagen').click();
+        });
+
+        // Drag & drop
+        const previewZona = document.getElementById('preview-zona');
+        previewZona.addEventListener('dragover', e => { e.preventDefault(); previewZona.classList.add('drag-over'); });
+        previewZona.addEventListener('dragleave', () => previewZona.classList.remove('drag-over'));
+        previewZona.addEventListener('drop', e => {
+            e.preventDefault();
+            previewZona.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                document.getElementById('input-imagen').files = dt.files;
+                mostrarPreview(file);
+            }
+        });
+
+        function previsualizarImagen(e) {
+            const file = e.target.files[0];
+            if (file) mostrarPreview(file);
+        }
+
+        function mostrarPreview(file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+                document.getElementById('preview-img').src = ev.target.result;
+                document.getElementById('preview-img').style.display = 'block';
+                document.getElementById('preview-placeholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function enviarPublicacion() {
+            const username = sessionStorage.getItem('username');
+            if (!username) { alert('Debes iniciar sesión.'); return; }
+
+            const titulo = document.getElementById('pub-titulo').value.trim();
+            const categoria = document.getElementById('pub-categoria').value.trim() || 'General';
+            const descripcion = document.getElementById('pub-descripcion').value.trim();
+            const fileInput = document.getElementById('input-imagen');
+            const errorDiv = document.getElementById('pub-error');
+
+            errorDiv.style.display = 'none';
+
+            if (!titulo) { mostrarError('El título es obligatorio.'); return; }
+            if (!fileInput.files || !fileInput.files[0]) { mostrarError('Debes seleccionar una imagen.'); return; }
+
+            const btn = document.getElementById('btn-enviar-pub');
+            btn.disabled = true;
+            document.getElementById('btn-pub-texto').textContent = '⏳ Subiendo...';
+
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('title', titulo);
+            formData.append('category', categoria);
+            formData.append('description', descripcion);
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch(`${API}/upload-post`, { method: 'POST', body: formData });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Error al publicar');
+
+                cerrarModalPublicar();
+                await cargarPosts();
+            } catch (err) {
+                mostrarError(err.message);
+                btn.disabled = false;
+                document.getElementById('btn-pub-texto').textContent = '🚀 Publicar';
+            }
+        }
+
+        function mostrarError(msg) {
+            const errorDiv = document.getElementById('pub-error');
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
+        }
     </script>
 
 </body>

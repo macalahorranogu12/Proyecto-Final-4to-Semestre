@@ -6,23 +6,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión</title>
     <link rel="stylesheet" href="login.css">
+    <style>
+        .alerta {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .alerta-error {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        .alerta-exito {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- formulario de login simple -->
     <div class="contenedor">
 
         <div class="login-box">
 
+            <a href="index.html" style="text-decoration: none; color: #7b2cbf; display: block; margin-bottom: 10px; font-weight: bold;">&larr; Volver al inicio</a>
             <h1>Iniciar Sesión</h1>
             <p>Bienvenido de nuevo</p>
+
+            <div id="alerta" class="alerta" style="display: none;"></div>
 
             <form>
 
                 <div class="campo">
-                    <label for="correo">Correo electrónico</label>
-                    <input type="email" id="correo" placeholder="ejemplo@gmail.com" required>
+                    <label for="identifier">Nombre de usuario o Correo</label>
+                    <input type="text" id="identifier" placeholder="Ingresa tu usuario o correo electrónico" required>
                 </div>
 
                 <div class="campo">
@@ -30,29 +57,68 @@
                     <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
                 </div>
 
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox">
-                        Recordar sesión
-                    </label>
-                </div>
-
-                <button type="submit">Ingresar</button>
+                <button type="submit">Entrar</button>
 
             </form>
 
             <div class="register-link">
-                <p>¿No tienes cuenta? <a href="register.html">Regístrate</a></p>
-            </div>
-
-            <div class="back-link">
-                <p><a href="index.html">Volver al inicio</a></p>
+                <p>¿No tienes una cuenta? <a href="register.html">Regístrate</a></p>
             </div>
 
         </div>
 
     </div>
 
+    <script>
+        document.querySelector('form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const identifier = document.getElementById('identifier').value.trim();
+            const password = document.getElementById('password').value;
+            const alerta = document.getElementById('alerta');
+            
+            // Ocultar alerta previa
+            alerta.style.display = 'none';
+            alerta.className = 'alerta';
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: identifier,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alerta.textContent = "¡Inicio de sesión exitoso! Redirigiendo...";
+                    alerta.classList.add('alerta-exito');
+                    alerta.style.display = 'block';
+                    
+                    // Almacenamos el nombre de usuario de la sesión
+                    sessionStorage.setItem('username', data.username);
+                    
+                    setTimeout(() => {
+                        window.location.href = "usuario.html";
+                    }, 1000);
+                } else {
+                    alerta.textContent = data.detail || "Usuario o contraseña incorrectos";
+                    alerta.classList.add('alerta-error');
+                    alerta.style.display = 'block';
+                }
+            } catch (error) {
+                alerta.textContent = "Error de conexión con el servidor";
+                alerta.classList.add('alerta-error');
+                alerta.style.display = 'block';
+                console.error(error);
+            }
+        });
+    </script>
 </body>
 
 </html>
