@@ -4,40 +4,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio - Piterest proyecto</title>
-    <link rel="stylesheet" href="index.css">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="login.css">
+    <style>
+        .alerta {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .alerta-error {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        .alerta-exito {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- header principal con busqueda y categorias -->
-    <header class="header">
+    <div class="contenedor">
 
-        <div class="logo">
-            <h1>Piterest proyecto</h1>
+        <div class="login-box">
+
+            <a href="index.html" style="text-decoration: none; color: #7b2cbf; display: block; margin-bottom: 10px; font-weight: bold;">&larr; Volver al inicio</a>
+            <h1>Iniciar Sesión</h1>
+            <p>Bienvenido de nuevo</p>
+
+            <div id="alerta" class="alerta" style="display: none;"></div>
+
+            <form>
+
+                <div class="campo">
+                    <label for="identifier">Nombre de usuario o Correo</label>
+                    <input type="text" id="identifier" placeholder="Ingresa tu usuario o correo electrónico" required>
+                </div>
+
+                <div class="campo">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+                </div>
+
+                <button type="submit">Entrar</button>
+
+            </form>
+
+            <div class="register-link">
+                <p>¿No tienes una cuenta? <a href="register.html">Regístrate</a></p>
+            </div>
+
         </div>
 
-        <div class="buscador">
-            <input type="text" id="busqueda" placeholder="Buscar imágenes, ideas...">
-        </div>
+    </div>
 
-        <div class="nav">
-            <a href="login.html">Iniciar sesión</a>
-            <a href="register.html">Registrarse</a>
-        </div>
+    <script>
+        document.querySelector('form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const identifier = document.getElementById('identifier').value.trim();
+            const password = document.getElementById('password').value;
+            const alerta = document.getElementById('alerta');
+            
+            // Ocultar alerta previa
+            alerta.style.display = 'none';
+            alerta.className = 'alerta';
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: identifier,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alerta.textContent = "¡Inicio de sesión exitoso! Redirigiendo...";
+                    alerta.classList.add('alerta-exito');
+                    alerta.style.display = 'block';
+                    
+                    // Almacenamos el nombre de usuario de la sesión
+                    sessionStorage.setItem('username', data.username);
+                    
+                    setTimeout(() => {
+                        window.location.href = "usuario.html";
+                    }, 1000);
+                } else {
+                    alerta.textContent = data.detail || "Usuario o contraseña incorrectos";
+                    alerta.classList.add('alerta-error');
+                    alerta.style.display = 'block';
+                }
+            } catch (error) {
+                alerta.textContent = "Error de conexión con el servidor";
+                alerta.classList.add('alerta-error');
+                alerta.style.display = 'block';
+                console.error(error);
+            }
+        });
+    </script>
+</body>
 
-    </header>
-
-    <!-- barra de categorias para filtrar contenido -->
-    <section class="categorias">
-
-        <button class="categoria-btn">Todo</button>
-        <button class="categoria-btn">Arte</button>
-        <button class="categoria-btn">Fotografía</button>
-        <button class="categoria-btn">Diseño</button>
-        <button class="categoria-btn">Naturaleza</button>
-        <button class="categoria-btn">Tecnología</button>
-        <button class="categoria-btn">Comida</button>
-        <button class="categoria-btn">Viajes</button>
-
-    </section>
+</html>
