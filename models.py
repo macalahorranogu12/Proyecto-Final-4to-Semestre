@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlmodel import SQLModel, Field, create_engine
 
 engine = create_engine("sqlite:///database.db")
@@ -5,32 +6,27 @@ engine = create_engine("sqlite:///database.db")
 
 class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
-
     username: str
-    nombre: str
-    apellido: str
-    sexo: str
-    fecha_nacimiento: str
-    correo: str
-
+    email: str | None = Field(default=None)
     hashed_password: str
 
 
-class UserRegister(SQLModel):
-    username: str
-    nombre: str
-    apellido: str
-    sexo: str
-    fecha_nacimiento: str
-    correo: str
-
-    password: str
-    confirm_password: str
+class UserProfile(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", unique=True)
+    avatar_path: str | None = Field(default=None)
+    bio: str | None = Field(default=None)
 
 
-class UserLogin(SQLModel):
-    correo: str
-    password: str
+class Post(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    username_display: str
+    image_path: str
+    title: str
+    description: str | None = Field(default=None)
+    category: str | None = Field(default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
 def create_db_and_tables():
