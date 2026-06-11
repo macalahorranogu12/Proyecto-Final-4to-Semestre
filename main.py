@@ -1,11 +1,16 @@
+<<<<<<< HEAD
 import os
 import shutil
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse
+=======
+from fastapi import FastAPI
+>>>>>>> b47f2a138fd20b2b3364f158591b51d453c52906
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select
 
+<<<<<<< HEAD
 from models import (
     engine,
     User,
@@ -15,13 +20,14 @@ from models import (
     UserLogin,
     create_db_and_tables
 )
+=======
+from models import create_db_and_tables
+>>>>>>> b47f2a138fd20b2b3364f158591b51d453c52906
 
-from auth import (
-    hash_password,
-    verify_password,
-    encrypt_data,
-    decrypt_data
-)
+from routes.auth_routes import router as auth_router
+from routes.profile_routes import router as profile_router
+from routes.post_routes import router as post_router
+from routes.static_routes import router as static_router
 
 app = FastAPI()
 
@@ -36,6 +42,7 @@ app.add_middleware(
 
 create_db_and_tables()
 
+<<<<<<< HEAD
 # Carpeta donde se guardan las imágenes subidas
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -340,3 +347,9 @@ def get_static_asset(filename: str):
         if os.path.exists(filename):
             return FileResponse(filename)
     raise HTTPException(status_code=404, detail="Archivo no encontrado")
+=======
+app.include_router(auth_router)
+app.include_router(profile_router)
+app.include_router(post_router)
+app.include_router(static_router)
+>>>>>>> b47f2a138fd20b2b3364f158591b51d453c52906

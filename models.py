@@ -1,5 +1,8 @@
 from datetime import datetime
+<<<<<<< HEAD
 from typing import Optional
+=======
+>>>>>>> b47f2a138fd20b2b3364f158591b51d453c52906
 from sqlmodel import SQLModel, Field, create_engine
 
 engine = create_engine("sqlite:///database.db")
@@ -12,11 +15,15 @@ class User(SQLModel, table=True):
 
 
 class UserProfile(SQLModel, table=True):
+<<<<<<< HEAD
     """Perfil extendido del usuario: foto de perfil y bio."""
+=======
+>>>>>>> b47f2a138fd20b2b3364f158591b51d453c52906
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id", unique=True)
     avatar_path: str | None = Field(default=None)
     bio: str | None = Field(default=None)
+<<<<<<< HEAD
 
 
 class Post(SQLModel, table=True):
@@ -42,6 +49,19 @@ class UserRegister(SQLModel):
 class UserLogin(SQLModel):
     username: str
     password: str
+=======
+
+
+class Post(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    username_display: str
+    image_path: str
+    title: str
+    description: str | None = Field(default=None)
+    category: str | None = Field(default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+>>>>>>> b47f2a138fd20b2b3364f158591b51d453c52906
 
 
 # ─── Inicialización ─────────────────────────────────────────────────────────
