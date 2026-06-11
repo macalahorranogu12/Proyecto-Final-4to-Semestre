@@ -3,15 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle - Piterest proyecto</title>
+    <title>Detalle - Piterest</title>
+    <meta name="description" content="Ver publicación en detalle, comentar y dar me gusta.">
     <link rel="stylesheet" href="detalle.css">
+    <style>
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .action-bar-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 10px 20px;
+            border-radius: 24px;
+            border: 2px solid transparent;
+            font-size: 14px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .like-action-btn {
+            background: rgba(239,68,68,0.1);
+            border-color: rgba(239,68,68,0.35);
+            color: #f87171;
+        }
+        .like-action-btn:hover,
+        .like-action-btn.liked {
+            background: #e60023;
+            border-color: #e60023;
+            color: white;
+        }
+        .save-action-btn {
+            background: rgba(123,44,191,0.1);
+            border-color: rgba(123,44,191,0.35);
+            color: #c77dff;
+        }
+        .save-action-btn:hover,
+        .save-action-btn.saved {
+            background: #7b2cbf;
+            border-color: #7b2cbf;
+            color: white;
+        }
+        .action-bar-btn svg { width: 17px; height: 17px; }
+        .comentario-fecha { font-size: 11px; color: #777; margin-top: 3px; }
+    </style>
 </head>
 <body>
     <header class="header">
         <div class="logo">
-            <a href="index.html" style="text-decoration: none; color: inherit;">
-                <h1>Piterest proyecto</h1>
-            </a>
+            <a href="index.html" style="text-decoration:none;color:inherit;"><h1>Piterest</h1></a>
         </div>
         <div class="nav">
             <a href="index.html">← Volver al inicio</a>
@@ -26,7 +65,23 @@
         <div class="info-detalle slide-in-right">
             <div class="post-header">
                 <h2 id="detalle-titulo">Cargando...</h2>
-                <button class="guardar-btn">Guardar</button>
+            </div>
+
+            <!-- Barra de acciones: like + guardar -->
+            <div class="action-bar">
+                <button class="action-bar-btn like-action-btn" id="btn-like" onclick="toggleLike()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <span id="like-label">Me gusta</span>
+                    <span id="like-count" style="opacity:.8;">(0)</span>
+                </button>
+                <button class="action-bar-btn save-action-btn" id="btn-save" onclick="toggleSave()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span id="save-label">Guardar</span>
+                </button>
             </div>
 
             <div class="usuario-info">
@@ -38,51 +93,41 @@
             </div>
 
             <span id="detalle-categoria" class="detalle-cat"></span>
-
             <p class="descripcion" id="detalle-descripcion"></p>
-
             <hr class="divisor">
 
+            <!-- Comentarios -->
             <div class="comentarios-seccion">
                 <h3>Comentarios</h3>
-
                 <div class="comentarios-lista" id="comentarios-lista">
-                    <p style="color:#666; font-size:14px; text-align:center; padding:20px 0;">
-                        Sé el primero en comentar.
-                    </p>
+                    <p style="color:#666;font-size:14px;text-align:center;padding:20px 0;">Cargando comentarios...</p>
                 </div>
-
                 <div class="agregar-comentario">
                     <img src="avatar.png" alt="Tu avatar" class="avatar-comentario" id="avatar-comentario-input">
                     <input type="text" id="input-comentario" placeholder="Añade un comentario..." class="input-comentario">
-                    <button class="enviar-btn" onclick="enviarComentario()">Enviar</button>
+                    <button class="enviar-btn" id="btn-enviar-comentario">Enviar</button>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        // Leer el post guardado en sessionStorage al hacer clic
+        const API = '';
+        let postId   = null;
+        let username = sessionStorage.getItem('username');
+
         document.addEventListener('DOMContentLoaded', () => {
             const raw = sessionStorage.getItem('postDetalle');
-
-            if (!raw) {
-                // No hay datos: redirigir al inicio
-                window.location.href = 'index.html';
-                return;
-            }
+            if (!raw) { window.location.href = 'index.html'; return; }
 
             const post = JSON.parse(raw);
+            postId = post.id;
 
-            // Imagen principal
+            // Imagen y título
             const imgEl = document.getElementById('detalle-img');
             imgEl.src = post.image_url;
             imgEl.alt = post.title;
-
-            // Título de la página
-            document.title = post.title + ' - Piterest proyecto';
-
-            // Info del post
+            document.title = post.title + ' - Piterest';
             document.getElementById('detalle-titulo').textContent = post.title;
             document.getElementById('detalle-username').textContent = '@' + post.username;
 
@@ -93,86 +138,199 @@
 
             // Categoría
             const catEl = document.getElementById('detalle-categoria');
-            if (post.category) {
-                catEl.textContent = post.category;
-                catEl.style.display = 'inline-block';
-            }
+            if (post.category) { catEl.textContent = post.category; catEl.style.display = 'inline-block'; }
 
             // Fecha
             if (post.created_at) {
                 const fecha = new Date(post.created_at);
-                const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('detalle-fecha').textContent =
-                    'Publicado el ' + fecha.toLocaleDateString('es-ES', opciones);
+                    'Publicado el ' + fecha.toLocaleDateString('es-ES', { year:'numeric', month:'long', day:'numeric' });
             }
 
-            // Cargar avatar del autor desde la API
+            // Avatars
             cargarAvatarAutor(post.username);
+            if (username) cargarAvatarPropio(username);
 
-            // Cargar avatar propio si hay sesión
-            const myUser = sessionStorage.getItem('username');
-            if (myUser) {
-                cargarAvatarPropio(myUser);
+            // Cargar estado like/save y comentarios
+            if (postId) {
+                cargarLikes();
+                cargarSaved();
+                cargarComentarios();
+            }
+
+            // Ocultar botones si no hay sesión
+            if (!username) {
+                document.getElementById('btn-like').title = 'Inicia sesión para dar like';
+                document.getElementById('btn-save').title = 'Inicia sesión para guardar';
             }
         });
 
-        async function cargarAvatarAutor(username) {
+        // ── Avatars ──────────────────────────────────────────────────────────
+        async function cargarAvatarAutor(uname) {
             try {
-                const res = await fetch('/profile/' + encodeURIComponent(username));
+                const res = await fetch('/profile/' + encodeURIComponent(uname));
                 if (!res.ok) return;
                 const data = await res.json();
-                if (data.avatar_url) {
-                    document.getElementById('detalle-avatar').src = data.avatar_url + '?t=' + Date.now();
-                }
-            } catch (e) { /* no crítico */ }
+                if (data.avatar_url) document.getElementById('detalle-avatar').src = data.avatar_url + '?t=' + Date.now();
+            } catch(e) {}
         }
-
-        async function cargarAvatarPropio(username) {
+        async function cargarAvatarPropio(uname) {
             try {
-                const res = await fetch('/profile/' + encodeURIComponent(username));
+                const res = await fetch('/profile/' + encodeURIComponent(uname));
                 if (!res.ok) return;
                 const data = await res.json();
-                if (data.avatar_url) {
-                    document.getElementById('avatar-comentario-input').src = data.avatar_url + '?t=' + Date.now();
+                if (data.avatar_url) document.getElementById('avatar-comentario-input').src = data.avatar_url + '?t=' + Date.now();
+            } catch(e) {}
+        }
+
+        // ── Likes ─────────────────────────────────────────────────────────────
+        async function cargarLikes() {
+            try {
+                const url = `/posts/${postId}/likes` + (username ? `?username=${encodeURIComponent(username)}` : '');
+                const res = await fetch(url);
+                const data = await res.json();
+                actualizarBtnLike(data.liked, data.count);
+            } catch(e) {}
+        }
+
+        function actualizarBtnLike(liked, count) {
+            const btn = document.getElementById('btn-like');
+            btn.classList.toggle('liked', liked);
+            btn.querySelector('svg').setAttribute('fill', liked ? 'currentColor' : 'none');
+            document.getElementById('like-label').textContent = liked ? 'Me gusta ✓' : 'Me gusta';
+            document.getElementById('like-count').textContent = `(${count})`;
+        }
+
+        async function toggleLike() {
+            if (!username) { window.location.href = 'login.html'; return; }
+            const btn   = document.getElementById('btn-like');
+            const liked = btn.classList.contains('liked');
+            try {
+                let res;
+                if (liked) {
+                    res = await fetch(`/posts/${postId}/like?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                } else {
+                    res = await fetch(`/posts/${postId}/like`, {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ username })
+                    });
                 }
-            } catch (e) { /* no crítico */ }
+                const data = await res.json();
+                actualizarBtnLike(data.liked, data.count);
+            } catch(e) {}
         }
 
-        // Comentarios locales (en sesión, sin backend por ahora)
-        const comentariosLocales = [];
-
-        function enviarComentario() {
-            const input = document.getElementById('input-comentario');
-            const texto = input.value.trim();
-            if (!texto) return;
-
-            const username = sessionStorage.getItem('username') || 'Anónimo';
-            comentariosLocales.push({ username, texto });
-            input.value = '';
-            renderComentarios();
+        // ── Saves ─────────────────────────────────────────────────────────────
+        async function cargarSaved() {
+            if (!username) return;
+            try {
+                const res  = await fetch(`/posts/${postId}/saved?username=${encodeURIComponent(username)}`);
+                const data = await res.json();
+                actualizarBtnSave(data.saved);
+            } catch(e) {}
         }
 
-        // Enviar con Enter
-        document.getElementById('input-comentario').addEventListener('keydown', e => {
-            if (e.key === 'Enter') enviarComentario();
-        });
+        function actualizarBtnSave(saved) {
+            const btn = document.getElementById('btn-save');
+            btn.classList.toggle('saved', saved);
+            btn.querySelector('svg').setAttribute('fill', saved ? 'currentColor' : 'none');
+            document.getElementById('save-label').textContent = saved ? 'Guardado ✓' : 'Guardar';
+        }
 
-        function renderComentarios() {
+        async function toggleSave() {
+            if (!username) { window.location.href = 'login.html'; return; }
+            const btn   = document.getElementById('btn-save');
+            const saved = btn.classList.contains('saved');
+            try {
+                let res;
+                if (saved) {
+                    res = await fetch(`/posts/${postId}/save?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                } else {
+                    res = await fetch(`/posts/${postId}/save`, {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ username })
+                    });
+                }
+                const data = await res.json();
+                actualizarBtnSave(data.saved);
+            } catch(e) {}
+        }
+
+        // ── Comentarios ───────────────────────────────────────────────────────
+        async function cargarComentarios() {
+            try {
+                const res      = await fetch(`/posts/${postId}/comments`);
+                const comments = await res.json();
+                renderComentarios(comments);
+            } catch(e) {
+                document.getElementById('comentarios-lista').innerHTML =
+                    '<p style="color:#666;font-size:14px;text-align:center;padding:20px 0;">No se pudieron cargar los comentarios.</p>';
+            }
+        }
+
+        function renderComentarios(comments) {
             const lista = document.getElementById('comentarios-lista');
-            if (comentariosLocales.length === 0) {
+            if (comments.length === 0) {
                 lista.innerHTML = '<p style="color:#666;font-size:14px;text-align:center;padding:20px 0;">Sé el primero en comentar.</p>';
                 return;
             }
-            lista.innerHTML = comentariosLocales.map(c => `
+            lista.innerHTML = comments.map(c => {
+                const fecha = new Date(c.created_at).toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' });
+                return `
                 <div class="comentario fade-in-up">
-                    <img src="avatar.png" alt="Avatar" class="avatar-comentario">
+                    <img src="avatar.png" alt="Avatar" class="avatar-comentario"
+                         onerror="this.src='avatar.png'"
+                         data-username="${c.username}">
                     <div class="comentario-contenido">
                         <strong>@${c.username}</strong>
-                        <p>${c.texto}</p>
+                        <p>${c.content}</p>
+                        <p class="comentario-fecha">${fecha}</p>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
+
+            // Intentar cargar avatares de los comentarios
+            lista.querySelectorAll('img[data-username]').forEach(img => {
+                fetch('/profile/' + encodeURIComponent(img.dataset.username))
+                    .then(r => r.json())
+                    .then(d => { if (d.avatar_url) img.src = d.avatar_url; })
+                    .catch(() => {});
+            });
         }
+
+        async function enviarComentario() {
+            if (!username) { alert('Debes iniciar sesión para comentar.'); return; }
+            const input   = document.getElementById('input-comentario');
+            const content = input.value.trim();
+            if (!content) return;
+
+            const btn = document.getElementById('btn-enviar-comentario');
+            btn.disabled = true;
+            try {
+                const res = await fetch(`/posts/${postId}/comments`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ username, content })
+                });
+                if (!res.ok) throw new Error();
+                input.value = '';
+                await cargarComentarios();
+            } catch(e) {
+                alert('Error al enviar el comentario.');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        document.getElementById('btn-enviar-comentario').addEventListener('click', enviarComentario);
+        document.getElementById('input-comentario').addEventListener('keydown', e => {
+            if (e.key === 'Enter') enviarComentario();
+        });
     </script>
+
+    <!-- Sidebar -->
+    <script src="/sidebar.js"></script>
 </body>
 </html>

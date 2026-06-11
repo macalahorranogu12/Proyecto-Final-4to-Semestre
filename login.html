@@ -100,8 +100,9 @@
                     alerta.classList.add('alerta-exito');
                     alerta.style.display = 'block';
                     
-                    // Almacenamos el nombre de usuario de la sesión
+                    // Almacenamos el nombre de usuario y datos de sesión
                     sessionStorage.setItem('username', data.username);
+                    sessionStorage.setItem('isAdult', data.is_adult ? 'true' : 'false');
                     
                     setTimeout(() => {
                         window.location.href = "usuario.html";
