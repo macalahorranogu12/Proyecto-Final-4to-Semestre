@@ -1,0 +1,35 @@
+# Entornos virtuales de Python — NUNCA subir a Git
+venv/
+.venv/
+env/
+ENV/
+
+# Caché de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Base de datos local
+*.db
+*.sqlite3
+
+# Variables de entorno
+.env
+.env.*
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Archivos de distribución Python
+dist/
+build/
+*.egg-info/
