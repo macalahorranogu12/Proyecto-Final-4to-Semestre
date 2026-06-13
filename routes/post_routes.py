@@ -7,22 +7,38 @@ from fastapi import (
     APIRouter,
     UploadFile,
     File,
-    Form
+    Form,
+    HTTPException
 )
 
 from sqlmodel import (
     Session,
-    select
+    select,
+    func
 )
 
 from models import (
     engine,
-    Post
+    Post,
+    Comment,
+    Like,
+    Save
+)
+
+from schemas import (
+    CommentCreate,
+    LikeAction,
+    SaveAction
 )
 
 from utils.helpers import (
     validate_image,
     get_user_by_username
+)
+
+from utils.post_utils import (
+    build_post_response,
+    build_comment_response
 )
 
 router = APIRouter()
@@ -39,7 +55,9 @@ async def upload_post(
     file: UploadFile = File(...)
 ):
 
-    validate_image(file.filename)
+    validate_image(
+        file.filename
+    )
 
     with Session(engine) as session:
 
@@ -53,7 +71,8 @@ async def upload_post(
         )[1].lower()
 
         timestamp = int(
-            datetime.utcnow().timestamp()
+            datetime.utcnow()
+            .timestamp()
             * 1000
         )
 
@@ -66,7 +85,11 @@ async def upload_post(
             filename
         )
 
-        with open(save_path, "wb") as f:
+        with open(
+            save_path,
+            "wb"
+        ) as f:
+
             shutil.copyfileobj(
                 file.file,
                 f
@@ -82,16 +105,20 @@ async def upload_post(
         )
 
         session.add(post)
+
         session.commit()
+
         session.refresh(post)
 
         return {
             "message":
-                "Publicación creada",
+            "Publicación creada",
+
             "post_id":
-                post.id,
+            post.id,
+
             "image_url":
-                f"/uploads/{filename}"
+            f"/uploads/{filename}"
         }
 
 
@@ -101,33 +128,43 @@ def get_all_posts():
     with Session(engine) as session:
 
         posts = session.exec(
-            select(Post).order_by(
+            select(Post)
+            .order_by(
                 Post.created_at.desc()
             )
         ).all()
 
-        return [
-            {
-                "id": p.id,
-                "username":
-                    p.username_display,
-                "image_url":
-                    f"/uploads/{os.path.basename(p.image_path)}",
-                "title":
-                    p.title,
-                "description":
-                    p.description,
-                "category":
-                    p.category,
-                "created_at":
-                    p.created_at.isoformat()
-            }
-            for p in posts
-        ]
+        result = []
+
+        for p in posts:
+
+            count = session.exec(
+                select(
+                    func.count(
+                        Like.id
+                    )
+                )
+                .where(
+                    Like.post_id
+                    ==
+                    p.id
+                )
+            ).one()
+
+            result.append(
+                build_post_response(
+                    p,
+                    count
+                )
+            )
+
+        return result
 
 
 @router.get("/posts/user/{username}")
-def get_user_posts(username: str):
+def get_user_posts(
+    username: str
+):
 
     with Session(engine) as session:
 
@@ -139,28 +176,66 @@ def get_user_posts(username: str):
         posts = session.exec(
             select(Post)
             .where(
-                Post.user_id == user.id
+                Post.user_id
+                ==
+                user.id
             )
             .order_by(
                 Post.created_at.desc()
             )
         ).all()
 
+        result = []
+
+        for p in posts:
+
+            count = session.exec(
+                select(
+                    func.count(
+                        Like.id
+                    )
+                )
+                .where(
+                    Like.post_id
+                    ==
+                    p.id
+                )
+            ).one()
+
+            result.append(
+                build_post_response(
+                    p,
+                    count
+                )
+            )
+
+        return result
+
+
+@router.get(
+    "/posts/{post_id}/comments"
+)
+def get_comments(
+    post_id: int
+):
+
+    with Session(engine) as session:
+
+        comments = session.exec(
+            select(Comment)
+            .where(
+                Comment.post_id
+                ==
+                post_id
+            )
+            .order_by(
+                Comment.created_at.asc()
+            )
+        ).all()
+
         return [
-            {
-                "id": p.id,
-                "username":
-                    p.username_display,
-                "image_url":
-                    f"/uploads/{os.path.basename(p.image_path)}",
-                "title":
-                    p.title,
-                "description":
-                    p.description,
-                "category":
-                    p.category,
-                "created_at":
-                    p.created_at.isoformat()
-            }
-            for p in posts
+            build_comment_response(
+                c
+            )
+            for c in comments
         ]

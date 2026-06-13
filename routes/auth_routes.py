@@ -1,5 +1,12 @@
-from fastapi import APIRouter, HTTPException
-from sqlmodel import Session, select
+from fastapi import (
+    APIRouter,
+    HTTPException
+)
+
+from sqlmodel import (
+    Session,
+    select
+)
 
 from models import (
     engine,
@@ -19,6 +26,10 @@ from security import (
     decrypt_data
 )
 
+from utils.date_utils import (
+    calculate_age
+)
+
 router = APIRouter()
 
 
@@ -31,53 +42,86 @@ def register(user: UserRegister):
             select(User)
         ).all()
 
+        username_input = user.username.strip().lower()
+        email_input = user.email.strip().lower()
+
         for db_user in users:
 
             try:
-                db_username = decrypt_data(
-                    db_user.username
+
+                db_username = (
+                    decrypt_data(
+                        db_user.username
+                    )
+                    .strip()
+                    .lower()
                 )
 
-                db_email = decrypt_data(
-                    db_user.email
-                ) if db_user.email else None
+                db_email = (
+                    decrypt_data(
+                        db_user.email
+                    )
+                    .strip()
+                    .lower()
+                    if db_user.email
+                    else None
+                )
 
             except Exception:
                 continue
 
-            if db_username == user.username:
+            if db_username == username_input:
+
                 raise HTTPException(
                     status_code=400,
                     detail="Usuario ya registrado"
                 )
 
-            if db_email == user.email:
+            if db_email == email_input:
+
                 raise HTTPException(
                     status_code=400,
                     detail="Correo ya registrado"
                 )
 
         new_user = User(
+
             username=encrypt_data(
-                user.username
+                user.username.strip()
             ),
+
             email=encrypt_data(
-                user.email
+                user.email.strip()
             ),
+
             hashed_password=hash_password(
                 user.password
             )
         )
 
         session.add(new_user)
+
         session.commit()
+
         session.refresh(new_user)
 
+        is_adult = False
+
+        if user.birthdate:
+
+            is_adult = (
+                calculate_age(
+                    user.birthdate
+                ) >= 18
+            )
+
         profile = UserProfile(
-            user_id=new_user.id
+            user_id=new_user.id,
+            is_adult=is_adult
         )
 
         session.add(profile)
+
         session.commit()
 
         return {
@@ -97,29 +141,48 @@ def login(user: UserLogin):
 
         found_user = None
 
+        login_input = user.username.strip().lower()
+
         for db_user in users:
 
             try:
-                username = decrypt_data(
-                    db_user.username
+
+                username = (
+                    decrypt_data(
+                        db_user.username
+                    )
+                    .strip()
+                    .lower()
                 )
 
-                email = decrypt_data(
-                    db_user.email
-                ) if db_user.email else None
+                email = (
+                    decrypt_data(
+                        db_user.email
+                    )
+                    .strip()
+                    .lower()
+                    if db_user.email
+                    else None
+                )
 
             except Exception:
                 continue
 
             if (
-                username == user.username
+                username == login_input
                 or
-                email == user.username
+                (
+                    email
+                    and
+                    email == login_input
+                )
             ):
+
                 found_user = db_user
                 break
 
         if not found_user:
+
             raise HTTPException(
                 status_code=401,
                 detail="Credenciales incorrectas"
@@ -129,14 +192,41 @@ def login(user: UserLogin):
             user.password,
             found_user.hashed_password
         ):
+
             raise HTTPException(
                 status_code=401,
                 detail="Credenciales incorrectas"
             )
 
-        return {
-            "message": "Login exitoso",
-            "username": decrypt_data(
-                found_user.username
+        actual_username = decrypt_data(
+            found_user.username
+        )
+
+        profile = session.exec(
+            select(UserProfile)
+            .where(
+                UserProfile.user_id
+                ==
+                found_user.id
             )
+        ).first()
+
+        is_adult = (
+            bool(
+                profile.is_adult
+            )
+            if profile
+            else False
+        )
+
+        return {
+
+            "message":
+            "Login exitoso",
+
+            "username":
+            actual_username,
+
+            "is_adult":
+            is_adult
         }
