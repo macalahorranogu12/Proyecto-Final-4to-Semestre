@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Piterest</title>
+    <meta name="description" content="Descubre y comparte imágenes increíbles en Piterest, la plataforma visual definitiva.">
+    <link rel="stylesheet" href="index.css">
+    <style>
+        /* ── Like / Save overlay en posts ─────────────────────────────── */
+        .post-img-container { position: relative; overflow: hidden; }
+        .post-hover-overlay {
+            position: absolute;
+            top: 10px; right: 10px;
+            display: flex; gap: 7px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .post:hover .post-hover-overlay { opacity: 1; pointer-events: all; }
+        .post-action-btn {
+            display: flex; align-items: center; gap: 5px;
+            background: rgba(0,0,0,0.68);
+            backdrop-filter: blur(6px);
+            border: none; color: #fff;
+            padding: 7px 13px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px; font-weight: 700;
+            transition: background 0.18s, transform 0.14s;
+        }
+        .post-action-btn:hover { transform: scale(1.07); }
+        .post-action-btn.liked  { background: rgba(230,0,35,0.82); }
+        .post-action-btn.saved  { background: rgba(123,44,191,0.82); }
+        .like-count { font-size: 12px; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <a href="index.html" style="text-decoration:none;color:inherit;"><h1>Piterest</h1></a>
+        </div>
+        <div class="buscador">
+            <input type="text" id="busqueda" placeholder="Buscar imágenes, ideas...">
+        </div>
+        <div class="nav" id="nav-links">
+            <a href="login.html">Iniciar sesión</a>
+            <a href="register.html">Registrarse</a>
+        </div>
+    </header>
+
+    <!-- Categorías -->
+    <section class="categorias">
+        <button class="categoria-btn active" data-cat="Todo">Todo</button>
+        <button class="categoria-btn" data-cat="Arte">Arte</button>
+        <button class="categoria-btn" data-cat="Fotografía">Fotografía</button>
+        <button class="categoria-btn" data-cat="Diseño">Diseño</button>
+        <button class="categoria-btn" data-cat="Naturaleza">Naturaleza</button>
+        <button class="categoria-btn" data-cat="Tecnología">Tecnología</button>
+        <button class="categoria-btn" data-cat="Comida">Comida</button>
+        <button class="categoria-btn" data-cat="Viajes">Viajes</button>
+    </section>
+
+    <!-- Galería -->
+    <main class="main-content">
+        <div class="galeria" id="galeria-principal">
+            <!-- placeholders estáticos de fallback -->
+            <div class="post post-placeholder" onclick="irADetalle(this,null)" data-cat="Arte">
+                <div class="post-img-container"><img src="https://images.unsplash.com/photo-1549490349-8643362247b5?w=500&h=600&fit=crop" alt="Arte abstracto" loading="lazy"></div>
+                <div class="post-info"><h3>Arte abstracto</h3><p>usuario1</p></div>
+            </div>
+            <div class="post post-placeholder" onclick="irADetalle(this,null)" data-cat="Naturaleza">
+                <div class="post-img-container"><img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&h=750&fit=crop" alt="Paisaje natural" loading="lazy"></div>
+                <div class="post-info"><h3>Paisaje natural</h3><p>usuario2</p></div>
+            </div>
+            <div class="post post-placeholder" onclick="irADetalle(this,null)" data-cat="Diseño">
+                <div class="post-img-container"><img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=580&fit=crop" alt="Diseño moderno" loading="lazy"></div>
+                <div class="post-info"><h3>Diseño moderno</h3><p>usuario3</p></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FAB publicar -->
+    <button class="fab-publicar" id="fab-publicar" title="Publicar imagen" onclick="abrirModalPublicar()">
+        <span class="fab-icon">＋</span>
+        <span class="fab-label">Publicar</span>
+    </button>
+
+    <!-- Modal publicar -->
+    <div class="modal-overlay" id="modal-publicar" onclick="cerrarModalSiFondo(event)">
+        <div class="modal-card">
+            <button class="modal-close" onclick="cerrarModalPublicar()" title="Cerrar">✕</button>
+            <h2 class="modal-title">✨ Nueva publicación</h2>
+            <div class="preview-zona" id="preview-zona">
+                <div class="preview-placeholder" id="preview-placeholder">
+                    <div class="preview-icon">🖼️</div>
+                    <p>Haz clic o arrastra una imagen aquí</p>
+                </div>
+                <img id="preview-img" class="preview-img" alt="Vista previa" style="display:none;">
+                <input type="file" id="input-imagen" accept="image/*" style="display:none;" onchange="previsualizarImagen(event)">
+            </div>
+            <div class="modal-campos">
+                <input type="text" id="pub-titulo" class="modal-input" placeholder="Título de la publicación *" maxlength="100">
+                <input type="text" id="pub-categoria" class="modal-input" placeholder="Categoría (Arte, Viajes…)" list="categorias-sugeridas" maxlength="50">
+                <datalist id="categorias-sugeridas">
+                    <option value="Arte"><option value="Fotografía"><option value="Diseño">
+                    <option value="Naturaleza"><option value="Tecnología"><option value="Comida"><option value="Viajes">
+                </datalist>
+                <textarea id="pub-descripcion" class="modal-textarea" placeholder="Descripción (opcional)" maxlength="300" rows="3"></textarea>
+                <div id="pub-error" class="pub-error" style="display:none;"></div>
+                <button class="btn-publicar-modal" id="btn-enviar-pub" onclick="enviarPublicacion()">
+                    <span id="btn-pub-texto">🚀 Publicar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = '';
+        let categoriaActiva = 'Todo';
+        let todosLosPosts = [];
+        let likedIds = new Set();
+        let savedIds  = new Set();
+
+        // ── Sesión ──────────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            const loggedUser = sessionStorage.getItem('username');
+            const navLinks   = document.getElementById('nav-links');
+            if (loggedUser && navLinks) {
+                navLinks.innerHTML = `
+                    <span style="color:#fff;font-weight:500;margin-right:12px;">Hola, @${loggedUser}</span>
+                    <a href="usuario.html" style="margin-right:12px;text-decoration:none;color:#c77dff;font-weight:bold;">Mi Perfil</a>
+                    <a href="#" onclick="cerrarSesion(event)" style="color:#ef4444;font-weight:bold;text-decoration:none;">Cerrar sesión</a>`;
+                document.getElementById('fab-publicar').classList.add('visible');
+            }
+            cargarPosts();
+        });
+
+        function cerrarSesion(e) {
+            e.preventDefault();
+            sessionStorage.clear();
+            window.location.reload();
+        }
+
+        // ── Galería ──────────────────────────────────────────────────────────
+        async function cargarPosts() {
+            try {
+                const res = await fetch(`${API}/posts`);
+                if (!res.ok) throw new Error();
+                const posts = await res.json();
+                if (posts.length > 0) {
+                    todosLosPosts = posts;
+                    // Cargar likes/saves del usuario
+                    await cargarEstadoUsuario();
+                    renderPosts(posts);
+                }
+            } catch (e) { todosLosPosts = []; }
+        }
+
+        async function cargarEstadoUsuario() {
+            const username = sessionStorage.getItem('username');
+            if (!username) return;
+            try {
+                const [likedRes, savedRes] = await Promise.all([
+                    fetch(`/profile/${encodeURIComponent(username)}/liked-posts`),
+                    fetch(`/profile/${encodeURIComponent(username)}/saved-posts`)
+                ]);
+                const liked = await likedRes.json();
+                const saved = await savedRes.json();
+                likedIds = new Set(liked.map(p => p.id));
+                savedIds  = new Set(saved.map(p => p.id));
+            } catch(e) {}
+        }
+
+        function renderPosts(posts) {
+            const galeria = document.getElementById('galeria-principal');
+            galeria.querySelectorAll('.post-placeholder').forEach(el => el.remove());
+
+            posts.forEach(p => {
+                const isLiked = likedIds.has(p.id);
+                const isSaved = savedIds.has(p.id);
+                const div = document.createElement('div');
+                div.className = 'post post-real';
+                div.setAttribute('data-cat', p.category || 'General');
+                div.setAttribute('data-id', p.id);
+                div.innerHTML = `
+                    <div class="post-img-container">
+                        <img src="${p.image_url}" alt="${p.title}" loading="lazy"
+                             onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&h=600&fit=crop'">
+                        <div class="post-hover-overlay">
+                            <button class="post-action-btn like-btn ${isLiked ? 'liked' : ''}"
+                                    data-id="${p.id}" onclick="toggleLike(event,${p.id})" title="Me gusta">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                                <span class="like-count">${p.like_count || 0}</span>
+                            </button>
+                            <button class="post-action-btn save-btn ${isSaved ? 'saved' : ''}"
+                                    data-id="${p.id}" onclick="toggleSave(event,${p.id})" title="Guardar">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="post-info" onclick="irADetalle(div,p)" style="cursor:pointer;">
+                        <h3>${p.title}</h3>
+                        <p>@${p.username}</p>
+                    </div>`;
+                div.querySelector('.post-info').onclick = () => irADetalle(div, p);
+                galeria.prepend(div);
+            });
+        }
+
+        // ── Like / Save ──────────────────────────────────────────────────────
+        async function toggleLike(e, postId) {
+            e.stopPropagation();
+            const username = sessionStorage.getItem('username');
+            if (!username) { window.location.href = 'login.html'; return; }
+
+            const btn     = e.currentTarget;
+            const isLiked = btn.classList.contains('liked');
+            try {
+                let res;
+                if (isLiked) {
+                    res = await fetch(`/posts/${postId}/like?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                } else {
+                    res = await fetch(`/posts/${postId}/like`, {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ username })
+                    });
+                }
+                if (!res.ok) return;
+                const data = await res.json();
+                btn.classList.toggle('liked', data.liked);
+                btn.querySelector('svg').setAttribute('fill', data.liked ? 'currentColor' : 'none');
+                btn.querySelector('.like-count').textContent = data.count;
+                data.liked ? likedIds.add(postId) : likedIds.delete(postId);
+            } catch(e) {}
+        }
+
+        async function toggleSave(e, postId) {
+            e.stopPropagation();
+            const username = sessionStorage.getItem('username');
+            if (!username) { window.location.href = 'login.html'; return; }
+
+            const btn     = e.currentTarget;
+            const isSaved = btn.classList.contains('saved');
+            try {
+                let res;
+                if (isSaved) {
+                    res = await fetch(`/posts/${postId}/save?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                } else {
+                    res = await fetch(`/posts/${postId}/save`, {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ username })
+                    });
+                }
+                if (!res.ok) return;
+                const data = await res.json();
+                btn.classList.toggle('saved', data.saved);
+                btn.querySelector('svg').setAttribute('fill', data.saved ? 'currentColor' : 'none');
+                data.saved ? savedIds.add(postId) : savedIds.delete(postId);
+            } catch(e) {}
+        }
+
+        // ── Filtrado ─────────────────────────────────────────────────────────
+        document.querySelectorAll('.categoria-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.categoria-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                categoriaActiva = this.getAttribute('data-cat');
+                filtrarPosts(categoriaActiva);
+            });
+        });
+
+        function filtrarPosts(cat) {
+            document.querySelectorAll('.post').forEach(post => {
+                post.style.display = (cat === 'Todo' || post.getAttribute('data-cat') === cat) ? '' : 'none';
+            });
+        }
+
+        // Buscador
+        document.getElementById('busqueda').addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            document.querySelectorAll('.post').forEach(post => {
+                const title = post.querySelector('h3')?.textContent.toLowerCase() || '';
+                const user  = post.querySelector('p')?.textContent.toLowerCase() || '';
+                post.style.display = (!q || title.includes(q) || user.includes(q)) ? '' : 'none';
+            });
+        });
+
+        // ── Detalle ──────────────────────────────────────────────────────────
+        function irADetalle(el, postData) {
+            if (postData) sessionStorage.setItem('postDetalle', JSON.stringify(postData));
+            window.location.href = 'detalle.html';
+        }
+
+        // ── Modal publicar ───────────────────────────────────────────────────
+        function abrirModalPublicar() {
+            document.getElementById('modal-publicar').classList.add('abierto');
+            document.body.style.overflow = 'hidden';
+        }
+        function cerrarModalPublicar() {
+            document.getElementById('modal-publicar').classList.remove('abierto');
+            document.body.style.overflow = '';
+            resetearModal();
+        }
+        function cerrarModalSiFondo(e) {
+            if (e.target.id === 'modal-publicar') cerrarModalPublicar();
+        }
+        function resetearModal() {
+            ['pub-titulo','pub-categoria','pub-descripcion'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('input-imagen').value = '';
+            document.getElementById('preview-img').style.display = 'none';
+            document.getElementById('preview-placeholder').style.display = 'flex';
+            document.getElementById('pub-error').style.display = 'none';
+            document.getElementById('btn-pub-texto').textContent = '🚀 Publicar';
+            document.getElementById('btn-enviar-pub').disabled = false;
+        }
+
+        document.getElementById('preview-zona').addEventListener('click', () => document.getElementById('input-imagen').click());
+
+        const pz = document.getElementById('preview-zona');
+        pz.addEventListener('dragover', e => { e.preventDefault(); pz.classList.add('drag-over'); });
+        pz.addEventListener('dragleave', () => pz.classList.remove('drag-over'));
+        pz.addEventListener('drop', e => {
+            e.preventDefault(); pz.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const dt = new DataTransfer(); dt.items.add(file);
+                document.getElementById('input-imagen').files = dt.files;
+                mostrarPreview(file);
+            }
+        });
+
+        function previsualizarImagen(e) { const f = e.target.files[0]; if (f) mostrarPreview(f); }
+        function mostrarPreview(file) {
+            const r = new FileReader();
+            r.onload = ev => {
+                document.getElementById('preview-img').src = ev.target.result;
+                document.getElementById('preview-img').style.display = 'block';
+                document.getElementById('preview-placeholder').style.display = 'none';
+            };
+            r.readAsDataURL(file);
+        }
+
+        async function enviarPublicacion() {
+            const username = sessionStorage.getItem('username');
+            if (!username) { alert('Debes iniciar sesión.'); return; }
+
+            const titulo      = document.getElementById('pub-titulo').value.trim();
+            const categoria   = document.getElementById('pub-categoria').value.trim() || 'General';
+            const descripcion = document.getElementById('pub-descripcion').value.trim();
+            const fileInput   = document.getElementById('input-imagen');
+
+            document.getElementById('pub-error').style.display = 'none';
+            if (!titulo)                            { mostrarError('El título es obligatorio.'); return; }
+            if (!fileInput.files || !fileInput.files[0]) { mostrarError('Debes seleccionar una imagen.'); return; }
+
+            const btn = document.getElementById('btn-enviar-pub');
+            btn.disabled = true;
+            document.getElementById('btn-pub-texto').textContent = '⏳ Subiendo...';
+
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('title', titulo);
+            formData.append('category', categoria);
+            formData.append('description', descripcion);
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res  = await fetch(`${API}/upload-post`, { method: 'POST', body: formData });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Error al publicar');
+                cerrarModalPublicar();
+                await cargarPosts();
+            } catch (err) {
+                mostrarError(err.message);
+                btn.disabled = false;
+                document.getElementById('btn-pub-texto').textContent = '🚀 Publicar';
+            }
+        }
+
+        function mostrarError(msg) {
+            const el = document.getElementById('pub-error');
+            el.textContent = msg; el.style.display = 'block';
+        }
+    </script>
+
+    <!-- Sidebar -->
+    <script src="/sidebar.js"></script>
+</body>
+
+</html>
