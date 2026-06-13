@@ -35,3 +35,25 @@ class FollowAction(SQLModel):
 class ProfileUpdate(SQLModel):
     new_username: str | None = None
     bio: str | None = None
+
+
+class UploadUrlRequest(SQLModel):
+    filename: str
+    contentType: str
+
+
+class UploadUrlResponse(SQLModel):
+    url: str
+    key: str
+
+
+class RegisterPostRequest(SQLModel):
+    s3_key: str
+    title: str
+    description: str | None = None
+    user: str
+
+
+class RegisterPostResponse(SQLModel):
+    post_id: int
+    image_url: str

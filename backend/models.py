@@ -26,7 +26,7 @@ class Post(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     username_display: str
-    image_path: str
+    s3_key: str
     title: str
     description: str | None = Field(default=None)
     category: str | None = Field(default=None)
@@ -76,6 +76,7 @@ def _migrate():
     from sqlalchemy import text
     migrations = [
         "ALTER TABLE userprofile ADD COLUMN is_adult INTEGER DEFAULT 0",
+        "ALTER TABLE post RENAME COLUMN image_path TO s3_key",
     ]
     with engine.connect() as conn:
         for sql in migrations:

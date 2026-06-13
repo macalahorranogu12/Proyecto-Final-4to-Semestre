@@ -5,8 +5,9 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from sqlmodel import Session, select, func
 
 from models import engine, Post, Comment, Like, Save
-from schemas import CommentCreate, LikeAction, SaveAction
+from schemas import CommentCreate, LikeAction, SaveAction, UploadUrlRequest, UploadUrlResponse, RegisterPostRequest, RegisterPostResponse
 from utils.helpers import validate_image, get_user_by_username
+from utils.s3_utils import generate_presigned_url, generate_presigned_get_url
 
 router = APIRouter()
 UPLOAD_DIR = "uploads"
@@ -18,7 +19,7 @@ def _post_dict(p: Post, like_count: int = 0):
     return {
         "id": p.id,
         "username": p.username_display,
-        "image_url": f"/uploads/{os.path.basename(p.image_path)}",
+        "image_url": generate_presigned_get_url(p.s3_key),
         "title": p.title,
         "description": p.description,
         "category": p.category,
@@ -49,7 +50,7 @@ async def upload_post(
         post = Post(
             user_id=user.id,
             username_display=username,
-            image_path=save_path,
+            s3_key=save_path,
             title=title,
             description=description,
             category=category
@@ -58,6 +59,39 @@ async def upload_post(
         session.commit()
         session.refresh(post)
         return {"message": "Publicación creada", "post_id": post.id, "image_url": f"/uploads/{filename}"}
+
+
+# ─── S3 Upload Flow ─────────────────────────────────────────────────────────────
+
+@router.post("/upload-url", response_model=UploadUrlResponse)
+async def get_upload_url(request: UploadUrlRequest):
+    """Genera una presigned URL para subir un archivo a S3."""
+    validate_image(request.filename)
+    result = generate_presigned_url(request.filename, request.contentType)
+    return result
+
+
+@router.post("/register-post", response_model=RegisterPostResponse)
+async def register_post(request: RegisterPostRequest):
+    """Registra un post después de que el archivo fue subido a S3."""
+    with Session(engine) as session:
+        user = get_user_by_username(session, request.user)
+        post = Post(
+            user_id=user.id,
+            username_display=request.user,
+            s3_key=request.s3_key,
+            title=request.title,
+            description=request.description,
+            category="General"
+        )
+        session.add(post)
+        session.commit()
+        session.refresh(post)
+        image_url = generate_presigned_get_url(post.s3_key)
+        return {
+            "post_id": post.id,
+            "image_url": image_url
+        }
 
 
 # ─── Get Posts ────────────────────────────────────────────────────────────────
