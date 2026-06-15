@@ -7,23 +7,23 @@ from models import engine, User, UserProfile, Post, Comment, Like, Save, Follow
 from schemas import ProfileUpdate, FollowAction
 from utils.helpers import validate_image, get_user_by_username
 from security import encrypt_data, decrypt_data
+from utils.s3_utils import generate_presigned_get_url
 
 router = APIRouter()
 UPLOAD_DIR = "uploads"
 
 
-def _post_dict(p: Post):
+from utils.s3_utils import generate_presigned_get_url
 
-    image_url = (
-        f"/uploads/{os.path.basename(p.s3_key)}"
-        if p.s3_key and p.s3_key.startswith("uploads")
-        else p.s3_key
-    )
+
+def _post_dict(p):
 
     return {
         "id": p.id,
         "username": p.username_display,
-        "image_url": image_url,
+        "image_url": generate_presigned_get_url(
+            p.s3_key
+        ),
         "title": p.title,
         "description": p.description,
         "category": p.category,

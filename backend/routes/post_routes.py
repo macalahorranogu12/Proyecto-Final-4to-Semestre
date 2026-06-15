@@ -17,16 +17,12 @@ UPLOAD_DIR = "uploads"
 
 def _post_dict(p: Post, like_count: int = 0):
 
-    image_url = (
-        f"/uploads/{os.path.basename(p.s3_key)}"
-        if p.s3_key and p.s3_key.startswith("uploads")
-        else generate_presigned_get_url(p.s3_key)
-    )
-
     return {
         "id": p.id,
         "username": p.username_display,
-        "image_url": image_url,
+        "image_url": generate_presigned_get_url(
+            p.s3_key
+        ),
         "title": p.title,
         "description": p.description,
         "category": p.category,

@@ -750,44 +750,95 @@
         }
 
         async function enviarPublicacion() {
-            const titulo = document.getElementById('pub-titulo').value.trim();
-            const categoria = document.getElementById('pub-categoria').value.trim() || 'General';
-            const descripcion = document.getElementById('pub-descripcion').value.trim();
-            const fileInput = document.getElementById('input-imagen');
-            const errorDiv = document.getElementById('pub-error');
 
-            errorDiv.style.display = 'none';
-            if (!titulo) { mostrarError('El título es obligatorio.'); return; }
-            if (!fileInput.files || !fileInput.files[0]) { mostrarError('Debes seleccionar una imagen.'); return; }
+            const titulo =
+                document.getElementById('pub-titulo').value.trim();
 
-            const btn = document.getElementById('btn-enviar-pub');
-            btn.disabled = true;
-            document.getElementById('btn-pub-texto').textContent = '⏳ Subiendo...';
+            const categoria =
+                document.getElementById('pub-categoria').value.trim()
+                || 'General';
 
-            const formData = new FormData();
-            formData.append('username', username);
-            formData.append('title', titulo);
-            formData.append('category', categoria);
-            formData.append('description', descripcion);
-            formData.append('file', fileInput.files[0]);
+            const descripcion =
+                document.getElementById('pub-descripcion').value.trim();
+
+            const file =
+                document.getElementById('input-imagen').files[0];
+
+            if (!titulo) {
+                mostrarError('Título obligatorio');
+                return;
+            }
+
+            if (!file) {
+                mostrarError('Selecciona imagen');
+                return;
+            }
 
             try {
-                const res = await fetch(`${API}/upload-post`, { method: 'POST', body: formData });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.detail || 'Error al publicar');
+
+                const upload = await fetch(
+                    '/upload-url',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            filename: file.name,
+                            contentType: file.type
+                        })
+                    }
+                );
+
+                const data = await upload.json();
+
+                await fetch(
+                    data.url,
+                    {
+                        method: 'PUT',
+                        body: file,
+                        headers: {
+                            'Content-Type': file.type
+                        }
+                    }
+                );
+
+                await fetch(
+                    '/register-post',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+
+                        body: JSON.stringify({
+                            user: username,
+                            title: titulo,
+                            description: descripcion,
+                            category: categoria,
+                            s3_key: data.key
+                        })
+                    }
+                );
+
                 cerrarModalPublicar();
+
                 await cargarMisPosts();
-            } catch (err) {
-                mostrarError(err.message);
-                btn.disabled = false;
-                document.getElementById('btn-pub-texto').textContent = '🚀 Publicar';
+
             }
+
+            catch (err) {
+
+                console.error(err);
+
+                mostrarError(
+                    'Error al subir'
+                );
+
+            }
+
         }
 
-        function mostrarError(msg) {
-            const el = document.getElementById('pub-error');
-            el.textContent = msg; el.style.display = 'block';
-        }
     </script>
 
     <!-- Sidebar -->
