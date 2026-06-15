@@ -120,7 +120,7 @@
     </div>
 
     <script>
-        const API = '';
+        const API_BASE = "http://127.0.0.1:8000";
         let categoriaActiva = 'Todo';
         let todosLosPosts = [];
         let likedIds = new Set();
@@ -149,7 +149,7 @@
         // ── Galería ──────────────────────────────────────────────────────────
         async function cargarPosts() {
             try {
-                const res = await fetch(`${API}/posts`);
+                const res = await fetch(`${API_BASE}/posts`);
                 if (!res.ok) throw new Error();
                 const posts = await res.json();
                 if (posts.length > 0) {
@@ -166,8 +166,8 @@
             if (!username) return;
             try {
                 const [likedRes, savedRes] = await Promise.all([
-                    fetch(`/profile/${encodeURIComponent(username)}/liked-posts`),
-                    fetch(`/profile/${encodeURIComponent(username)}/saved-posts`)
+                    fetch(`${API_BASE}/profile/${encodeURIComponent(username)}/liked-posts`),
+                    fetch(`${API_BASE}/profile/${encodeURIComponent(username)}/saved-posts`)
                 ]);
                 const liked = await likedRes.json();
                 const saved = await savedRes.json();
@@ -227,9 +227,9 @@
             try {
                 let res;
                 if (isLiked) {
-                    res = await fetch(`/posts/${postId}/like?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                    res = await fetch(`${API_BASE}/posts/${postId}/like?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
                 } else {
-                    res = await fetch(`/posts/${postId}/like`, {
+                    res = await fetch(`${API_BASE}/posts/${postId}/like`, {
                         method: 'POST',
                         headers: {'Content-Type':'application/json'},
                         body: JSON.stringify({ username })
@@ -254,9 +254,9 @@
             try {
                 let res;
                 if (isSaved) {
-                    res = await fetch(`/posts/${postId}/save?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                    res = await fetch(`${API_BASE}/posts/${postId}/save?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
                 } else {
-                    res = await fetch(`/posts/${postId}/save`, {
+                    res = await fetch(`${API_BASE}/posts/${postId}/save`, {
                         method: 'POST',
                         headers: {'Content-Type':'application/json'},
                         body: JSON.stringify({ username })
@@ -364,21 +364,49 @@
             if (!titulo)                            { mostrarError('El título es obligatorio.'); return; }
             if (!fileInput.files || !fileInput.files[0]) { mostrarError('Debes seleccionar una imagen.'); return; }
 
+            const file = fileInput.files[0];
             const btn = document.getElementById('btn-enviar-pub');
             btn.disabled = true;
             document.getElementById('btn-pub-texto').textContent = '⏳ Subiendo...';
 
-            const formData = new FormData();
-            formData.append('username', username);
-            formData.append('title', titulo);
-            formData.append('category', categoria);
-            formData.append('description', descripcion);
-            formData.append('file', fileInput.files[0]);
-
             try {
-                const res  = await fetch(`${API}/upload-post`, { method: 'POST', body: formData });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.detail || 'Error al publicar');
+                // Paso 1: Obtener presigned URL del backend
+                document.getElementById('btn-pub-texto').textContent = '⏳ Preparando subida...';
+                const uploadUrlRes = await fetch(`${API_BASE}/upload-url`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        filename: file.name,
+                        contentType: file.type
+                    })
+                });
+                const uploadUrlData = await uploadUrlRes.json();
+                if (!uploadUrlRes.ok) throw new Error(uploadUrlData.detail || 'Error al obtener URL de subida');
+
+                // Paso 2: Subir archivo directamente a S3
+                document.getElementById('btn-pub-texto').textContent = '⏳ Subiendo a S3...';
+                const s3Res = await fetch(uploadUrlData.url, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {'Content-Type': file.type}
+                });
+                if (!s3Res.ok) throw new Error('Error al subir archivo a S3');
+
+                // Paso 3: Registrar el post en la base de datos
+                document.getElementById('btn-pub-texto').textContent = '⏳ Registrando publicación...';
+                const registerRes = await fetch(`${API_BASE}/register-post`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        s3_key: uploadUrlData.key,
+                        title: titulo,
+                        description: descripcion,
+                        user: username
+                    })
+                });
+                const registerData = await registerRes.json();
+                if (!registerRes.ok) throw new Error(registerData.detail || 'Error al registrar publicación');
+
                 cerrarModalPublicar();
                 await cargarPosts();
             } catch (err) {

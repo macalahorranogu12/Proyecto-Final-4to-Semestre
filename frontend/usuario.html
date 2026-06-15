@@ -265,7 +265,7 @@
     </div>
 
     <script>
-        const API      = '';
+        const API_BASE = "http://127.0.0.1:8000";
         let username   = sessionStorage.getItem('username');
         let currentTab = 'mis-posts';
 
@@ -281,7 +281,7 @@
         // ── Perfil ───────────────────────────────────────────────────────────
         async function cargarPerfil() {
             try {
-                const res  = await fetch(`${API}/profile/${encodeURIComponent(username)}`);
+                const res  = await fetch(`${API_BASE}/profile/${encodeURIComponent(username)}`);
                 if (!res.ok) return;
                 const data = await res.json();
 
@@ -312,7 +312,7 @@
             btn.disabled = true; btn.textContent = 'Guardando...';
 
             try {
-                const res = await fetch(`${API}/profile/${encodeURIComponent(username)}`, {
+                const res = await fetch(`${API_BASE}/profile/${encodeURIComponent(username)}`, {
                     method: 'PUT',
                     headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({
@@ -354,12 +354,9 @@
             const loading = document.getElementById('avatar-loading');
             loading.style.display = 'block';
 
-            const formData = new FormData();
-            formData.append('username', username);
-            formData.append('file', file);
 
             try {
-                const res  = await fetch(`${API}/upload-avatar`, { method: 'POST', body: formData });
+                const res  = await fetch(`${API_BASE}/upload-avatar`, { method: 'POST', body: formData });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.detail || 'Error');
                 document.getElementById('avatar-img').src = data.avatar_url + '?t=' + Date.now();
@@ -387,7 +384,7 @@
         async function cargarMisPosts() {
             const galeria = document.getElementById('galeria-usuario');
             try {
-                const res   = await fetch(`${API}/posts/user/${encodeURIComponent(username)}`);
+                const res   = await fetch(`${API_BASE}/posts/user/${encodeURIComponent(username)}`);
                 const posts = await res.json();
                 document.getElementById('pub-cargando').style.display = 'none';
                 renderGaleria(galeria, posts, 'No has publicado nada aún.', true);
@@ -402,7 +399,7 @@
             const galeria = document.getElementById('galeria-liked');
             galeria.innerHTML = '<div class="pub-cargando"><div class="spinner"></div><p>Cargando...</p></div>';
             try {
-                const res   = await fetch(`${API}/profile/${encodeURIComponent(username)}/liked-posts`);
+                const res   = await fetch(`${API_BASE}/profile/${encodeURIComponent(username)}/liked-posts`);
                 const posts = await res.json();
                 renderGaleria(galeria, posts, 'Aún no has dado like a ninguna publicación.');
             } catch(e) {
@@ -415,7 +412,7 @@
             const galeria = document.getElementById('galeria-saved');
             galeria.innerHTML = '<div class="pub-cargando"><div class="spinner"></div><p>Cargando...</p></div>';
             try {
-                const res   = await fetch(`${API}/profile/${encodeURIComponent(username)}/saved-posts`);
+                const res   = await fetch(`${API_BASE}/profile/${encodeURIComponent(username)}/saved-posts`);
                 const posts = await res.json();
                 renderGaleria(galeria, posts, 'Aún no has guardado ninguna publicación.');
             } catch(e) {
@@ -558,18 +555,46 @@
             const btn = document.getElementById('btn-enviar-pub');
             btn.disabled = true;
             document.getElementById('btn-pub-texto').textContent = '⏳ Subiendo...';
+            const file = fileInput.files[0];
 
-            const formData = new FormData();
-            formData.append('username', username);
-            formData.append('title', titulo);
-            formData.append('category', categoria);
-            formData.append('description', descripcion);
-            formData.append('file', fileInput.files[0]);
 
             try {
-                const res  = await fetch(`${API}/upload-post`, { method: 'POST', body: formData });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.detail || 'Error al publicar');
+                // Paso 1: Obtener presigned URL del backend
+                document.getElementById('btn-pub-texto').textContent = '⏳ Preparando subida...';
+                const uploadUrlRes = await fetch(`${API_BASE}/upload-url`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        filename: file.name,
+                        contentType: file.type
+                    })
+                });
+                const uploadUrlData = await uploadUrlRes.json();
+                if (!uploadUrlRes.ok) throw new Error(uploadUrlData.detail || 'Error al obtener URL de subida');
+
+                // Paso 2: Subir archivo directamente a S3
+                document.getElementById('btn-pub-texto').textContent = '⏳ Subiendo a S3...';
+                const s3Res = await fetch(uploadUrlData.url, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {'Content-Type': file.type}
+                });
+                if (!s3Res.ok) throw new Error('Error al subir archivo a S3');
+
+                // Paso 3: Registrar el post en la base de datos
+                document.getElementById('btn-pub-texto').textContent = '⏳ Registrando publicación...';
+                const registerRes = await fetch(`${API_BASE}/register-post`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        s3_key: uploadUrlData.key,
+                        title: titulo,
+                        description: descripcion,
+                        user: username
+                    })
+                });
+                const registerData = await registerRes.json();
+                if (!registerRes.ok) throw new Error(registerData.detail || 'Error al registrar publicación');
                 cerrarModalPublicar();
                 await cargarMisPosts();
             } catch(err) {

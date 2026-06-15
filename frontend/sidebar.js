@@ -2,6 +2,8 @@
 (function () {
     'use strict';
 
+    const API_BASE = "http://127.0.0.1:8000";
+
     /* ── Inyectar CSS ─────────────────────────────────────────────────────── */
     if (!document.getElementById('sidebar-css-link')) {
         const lnk = document.createElement('link');
@@ -142,7 +144,7 @@
         // Avatar del usuario logueado
         const username = sessionStorage.getItem('username');
         if (username) {
-            fetch('/profile/' + encodeURIComponent(username))
+            fetch(`${API_BASE}/profile/` + encodeURIComponent(username))
                 .then(r => r.json())
                 .then(d => {
                     if (d.avatar_url) {

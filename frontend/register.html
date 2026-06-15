@@ -89,6 +89,8 @@
     </div>
 
     <script>
+        const API_BASE = "http://127.0.0.1:8000";
+
         document.querySelector('form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -110,7 +112,7 @@
             }
 
             try {
-                const response = await fetch('/register', {
+                const response = await fetch(`${API_BASE}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

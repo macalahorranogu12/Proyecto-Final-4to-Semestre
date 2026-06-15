@@ -70,6 +70,8 @@
     </div>
 
     <script>
+        const API_BASE = "http://127.0.0.1:8000";
+
         document.querySelector('form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -82,7 +84,7 @@
             alerta.className = 'alerta';
             
             try {
-                const response = await fetch('/login', {
+                const response = await fetch(`${API_BASE}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
