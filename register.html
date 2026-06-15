@@ -7,6 +7,7 @@
     <title>Registro - Piterest</title>
     <meta name="description" content="Crea tu cuenta en Piterest y empieza a compartir tus ideas.">
     <link rel="stylesheet" href="register.css">
+    <script src="/config.js"></script>
     <style>
         .alerta {
             padding: 12px;
@@ -110,7 +111,7 @@
             }
 
             try {
-                const response = await fetch('/register', {
+                const response = await fetch(`${API}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

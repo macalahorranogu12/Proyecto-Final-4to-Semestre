@@ -142,7 +142,7 @@
         // Avatar del usuario logueado
         const username = sessionStorage.getItem('username');
         if (username) {
-            fetch('/profile/' + encodeURIComponent(username))
+            fetch(`${API}/profile/` + encodeURIComponent(username))
                 .then(r => r.json())
                 .then(d => {
                     if (d.avatar_url) {

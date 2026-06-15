@@ -7,6 +7,7 @@
     <title>Mi Perfil - Piterest</title>
     <meta name="description" content="Tu perfil en Piterest: gestiona publicaciones, seguidores y configuración.">
     <link rel="stylesheet" href="usuario.css">
+    <script src="/config.js"></script>
     <script>
         if (!sessionStorage.getItem('username')) window.location.href = 'login.html';
     </script>
@@ -265,7 +266,6 @@
     </div>
 
     <script>
-        const API      = '';
         let username   = sessionStorage.getItem('username');
         let currentTab = 'mis-posts';
 
@@ -465,8 +465,8 @@
 
             try {
                 const endpoint = tipo === 'followers'
-                    ? `/profile/${encodeURIComponent(username)}/followers`
-                    : `/profile/${encodeURIComponent(username)}/following`;
+                    ? `${API}/profile/${encodeURIComponent(username)}/followers`
+                    : `${API}/profile/${encodeURIComponent(username)}/following`;
                 const res   = await fetch(endpoint);
                 const users = await res.json();
 
@@ -586,6 +586,7 @@
     </script>
 
     <!-- Sidebar -->
+    <script src="/config.js"></script>
     <script src="/sidebar.js"></script>
 </body>
 

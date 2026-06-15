@@ -119,8 +119,8 @@
         </div>
     </div>
 
+    <script src="/config.js"></script>
     <script>
-        const API = '';
         let categoriaActiva = 'Todo';
         let todosLosPosts = [];
         let likedIds = new Set();
@@ -166,8 +166,8 @@
             if (!username) return;
             try {
                 const [likedRes, savedRes] = await Promise.all([
-                    fetch(`/profile/${encodeURIComponent(username)}/liked-posts`),
-                    fetch(`/profile/${encodeURIComponent(username)}/saved-posts`)
+                    fetch(`${API}/profile/${encodeURIComponent(username)}/liked-posts`),
+                    fetch(`${API}/profile/${encodeURIComponent(username)}/saved-posts`)
                 ]);
                 const liked = await likedRes.json();
                 const saved = await savedRes.json();
@@ -227,9 +227,9 @@
             try {
                 let res;
                 if (isLiked) {
-                    res = await fetch(`/posts/${postId}/like?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                    res = await fetch(`${API}/posts/${postId}/like?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
                 } else {
-                    res = await fetch(`/posts/${postId}/like`, {
+                    res = await fetch(`${API}/posts/${postId}/like`, {
                         method: 'POST',
                         headers: {'Content-Type':'application/json'},
                         body: JSON.stringify({ username })
@@ -254,9 +254,9 @@
             try {
                 let res;
                 if (isSaved) {
-                    res = await fetch(`/posts/${postId}/save?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                    res = await fetch(`${API}/posts/${postId}/save?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
                 } else {
-                    res = await fetch(`/posts/${postId}/save`, {
+                    res = await fetch(`${API}/posts/${postId}/save`, {
                         method: 'POST',
                         headers: {'Content-Type':'application/json'},
                         body: JSON.stringify({ username })
@@ -395,6 +395,7 @@
     </script>
 
     <!-- Sidebar -->
+    <script src="/config.js"></script>
     <script src="/sidebar.js"></script>
 </body>
 

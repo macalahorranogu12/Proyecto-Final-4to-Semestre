@@ -6,6 +6,7 @@
     <title>Detalle - Piterest</title>
     <meta name="description" content="Ver publicación en detalle, comentar y dar me gusta.">
     <link rel="stylesheet" href="detalle.css">
+    <script src="/config.js"></script>
     <style>
         .action-bar {
             display: flex;
@@ -112,7 +113,6 @@
     </main>
 
     <script>
-        const API = '';
         let postId   = null;
         let username = sessionStorage.getItem('username');
 
@@ -168,7 +168,7 @@
         // ── Avatars ──────────────────────────────────────────────────────────
         async function cargarAvatarAutor(uname) {
             try {
-                const res = await fetch('/profile/' + encodeURIComponent(uname));
+                const res = await fetch(`${API}/profile/` + encodeURIComponent(uname));
                 if (!res.ok) return;
                 const data = await res.json();
                 if (data.avatar_url) document.getElementById('detalle-avatar').src = data.avatar_url + '?t=' + Date.now();
@@ -176,7 +176,7 @@
         }
         async function cargarAvatarPropio(uname) {
             try {
-                const res = await fetch('/profile/' + encodeURIComponent(uname));
+                const res = await fetch(`${API}/profile/` + encodeURIComponent(uname));
                 if (!res.ok) return;
                 const data = await res.json();
                 if (data.avatar_url) document.getElementById('avatar-comentario-input').src = data.avatar_url + '?t=' + Date.now();
@@ -186,7 +186,7 @@
         // ── Likes ─────────────────────────────────────────────────────────────
         async function cargarLikes() {
             try {
-                const url = `/posts/${postId}/likes` + (username ? `?username=${encodeURIComponent(username)}` : '');
+                const url = `${API}/posts/${postId}/likes` + (username ? `?username=${encodeURIComponent(username)}` : '');
                 const res = await fetch(url);
                 const data = await res.json();
                 actualizarBtnLike(data.liked, data.count);
@@ -208,9 +208,9 @@
             try {
                 let res;
                 if (liked) {
-                    res = await fetch(`/posts/${postId}/like?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                    res = await fetch(`${API}/posts/${postId}/like?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
                 } else {
-                    res = await fetch(`/posts/${postId}/like`, {
+                    res = await fetch(`${API}/posts/${postId}/like`, {
                         method: 'POST',
                         headers: {'Content-Type':'application/json'},
                         body: JSON.stringify({ username })
@@ -225,7 +225,7 @@
         async function cargarSaved() {
             if (!username) return;
             try {
-                const res  = await fetch(`/posts/${postId}/saved?username=${encodeURIComponent(username)}`);
+                const res  = await fetch(`${API}/posts/${postId}/saved?username=${encodeURIComponent(username)}`);
                 const data = await res.json();
                 actualizarBtnSave(data.saved);
             } catch(e) {}
@@ -245,9 +245,9 @@
             try {
                 let res;
                 if (saved) {
-                    res = await fetch(`/posts/${postId}/save?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
+                    res = await fetch(`${API}/posts/${postId}/save?username=${encodeURIComponent(username)}`, { method: 'DELETE' });
                 } else {
-                    res = await fetch(`/posts/${postId}/save`, {
+                    res = await fetch(`${API}/posts/${postId}/save`, {
                         method: 'POST',
                         headers: {'Content-Type':'application/json'},
                         body: JSON.stringify({ username })
@@ -261,7 +261,7 @@
         // ── Comentarios ───────────────────────────────────────────────────────
         async function cargarComentarios() {
             try {
-                const res      = await fetch(`/posts/${postId}/comments`);
+                const res      = await fetch(`${API}/posts/${postId}/comments`);
                 const comments = await res.json();
                 renderComentarios(comments);
             } catch(e) {
@@ -293,7 +293,7 @@
 
             // Intentar cargar avatares de los comentarios
             lista.querySelectorAll('img[data-username]').forEach(img => {
-                fetch('/profile/' + encodeURIComponent(img.dataset.username))
+                fetch(`${API}/profile/` + encodeURIComponent(img.dataset.username))
                     .then(r => r.json())
                     .then(d => { if (d.avatar_url) img.src = d.avatar_url; })
                     .catch(() => {});
@@ -309,7 +309,7 @@
             const btn = document.getElementById('btn-enviar-comentario');
             btn.disabled = true;
             try {
-                const res = await fetch(`/posts/${postId}/comments`, {
+                const res = await fetch(`${API}/posts/${postId}/comments`, {
                     method: 'POST',
                     headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ username, content })
@@ -331,6 +331,7 @@
     </script>
 
     <!-- Sidebar -->
+    <script src="/config.js"></script>
     <script src="/sidebar.js"></script>
 </body>
 </html>
