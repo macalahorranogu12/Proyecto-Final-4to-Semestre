@@ -89,7 +89,7 @@ async def register_post(request: RegisterPostRequest):
             s3_key=request.s3_key,
             title=request.title,
             description=request.description,
-            category="General"
+            category=request.category
         )
         session.add(post)
         session.commit()

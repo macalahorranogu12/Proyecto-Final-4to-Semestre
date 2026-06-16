@@ -51,6 +51,7 @@ class RegisterPostRequest(SQLModel):
     s3_key: str
     title: str
     description: str | None = None
+    category: str | None = "General"
     user: str
 
 

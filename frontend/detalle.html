@@ -187,6 +187,11 @@
                     <p class="nombre-usuario" id="detalle-username">@usuario</p>
                     <p class="fecha-publicacion" id="detalle-fecha">Publicado recientemente</p>
                 </div>
+
+                <button id="btn-follow" class="action-bar-btn" style="display:none;">
+                    Seguir
+                </button>
+
             </div>
 
             <span id="detalle-categoria" class="detalle-cat"></span>
@@ -234,6 +239,94 @@
         let postId = null;
         let username = sessionStorage.getItem('username');
 
+        async function cargarEstadoFollow(autor) {
+
+            try {
+
+                const res = await fetch(
+                    `/follow/status?follower=${encodeURIComponent(username)}&following=${encodeURIComponent(autor)}`
+                );
+
+                const data = await res.json();
+
+                actualizarBotonFollow(data.following);
+
+            } catch (e) {
+                console.error('Error obteniendo estado follow:', e);
+            }
+        }
+
+        function actualizarBotonFollow(siguiendo) {
+
+            const btn = document.getElementById('btn-follow');
+
+            btn.dataset.following = siguiendo;
+
+            btn.textContent = siguiendo
+                ? 'Siguiendo'
+                : 'Seguir';
+        }
+
+        async function toggleFollow() {
+
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const post = JSON.parse(
+                sessionStorage.getItem('postDetalle')
+            );
+
+            const autor = post.username;
+
+            const btn = document.getElementById('btn-follow');
+
+            const siguiendo =
+                btn.dataset.following === 'true';
+
+            try {
+
+                let res;
+
+                if (siguiendo) {
+
+                    res = await fetch(
+                        `/follow?follower=${encodeURIComponent(username)}&following=${encodeURIComponent(autor)}`,
+                        {
+                            method: 'DELETE'
+                        }
+                    );
+
+                } else {
+
+                    res = await fetch(
+                        '/follow',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                follower: username,
+                                following: autor
+                            })
+                        }
+                    );
+                }
+
+                const data = await res.json();
+
+                actualizarBotonFollow(data.following);
+
+            } catch (e) {
+                console.error('Error follow:', e);
+            }
+        }
+
+        document.getElementById('btn-follow')
+            .addEventListener('click', toggleFollow);
+
         document.addEventListener('DOMContentLoaded', () => {
             const raw = sessionStorage.getItem('postDetalle');
             if (!raw) { window.location.href = 'index.html'; return; }
@@ -243,6 +336,15 @@
 
             if (username && post.username === username) {
                 document.getElementById('btn-delete').style.display = 'flex';
+            }
+
+            if (
+                username &&
+                post.username !== username
+            ) {
+                document.getElementById('btn-follow').style.display = 'flex';
+
+                cargarEstadoFollow(post.username);
             }
 
             const imgEl = document.getElementById('detalle-img');
@@ -494,6 +596,9 @@
                 }
             });
         });
+
+
+
 
     </script>
     <script src="/sidebar.js"></script>

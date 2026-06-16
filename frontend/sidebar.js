@@ -1,23 +1,23 @@
 /* sidebar.js – Componente de sidebar + modal de configuración */
 (function () {
-  'use strict';
+    'use strict';
 
-  /* ── Inyectar CSS ─────────────────────────────────────────────────────── */
-  if (!document.getElementById('sidebar-css-link')) {
-    const lnk = document.createElement('link');
-    lnk.id = 'sidebar-css-link';
-    lnk.rel = 'stylesheet';
-    lnk.href = '/sidebar.css';
-    document.head.appendChild(lnk);
-  }
+    /* ── Inyectar CSS ─────────────────────────────────────────────────────── */
+    if (!document.getElementById('sidebar-css-link')) {
+        const lnk = document.createElement('link');
+        lnk.id = 'sidebar-css-link';
+        lnk.rel = 'stylesheet';
+        lnk.href = '/sidebar.css';
+        document.head.appendChild(lnk);
+    }
 
-  const path = window.location.pathname;
-  const isIndex = path.endsWith('index.html') || path === '/' || path === '';
-  const isUsuario = path.endsWith('usuario.html');
-  const isDetalle = path.endsWith('detalle.html');
+    const path = window.location.pathname;
+    const isIndex    = path.endsWith('index.html') || path === '/' || path === '';
+    const isUsuario  = path.endsWith('usuario.html');
+    const isDetalle  = path.endsWith('detalle.html');
 
-  /* ── HTML del Sidebar ─────────────────────────────────────────────────── */
-  const sidebarHTML = `
+    /* ── HTML del Sidebar ─────────────────────────────────────────────────── */
+    const sidebarHTML = `
 <aside class="sidebar" id="app-sidebar">
   <div class="sidebar-logo">
     <a href="/" class="sidebar-logo-link" title="Inicio">
@@ -73,8 +73,8 @@
   </div>
 </aside>`;
 
-  /* ── HTML del Modal de Configuración ──────────────────────────────────── */
-  const modalHTML = `
+    /* ── HTML del Modal de Configuración ──────────────────────────────────── */
+    const modalHTML = `
 <div class="settings-modal-overlay" id="settings-modal-overlay">
   <div class="settings-modal">
     <div class="settings-modal-header">
@@ -98,7 +98,7 @@
           <span class="toggle-slider"></span>
         </label>
       </div>
-      <div class="settings-row" id="nsfw-settings-row">
+      <div class="settings-row" id="nsfw-settings-row" style="display:none">
         <div class="settings-row-info">
           <span class="settings-row-icon">🔞</span>
           <span class="settings-row-label">Contenido para adultos (NSFW)</span>
@@ -133,112 +133,107 @@
   </div>
 </div>`;
 
-  /* ── Init ─────────────────────────────────────────────────────────────── */
-  function init() {
-    document.body.classList.add('has-sidebar');
-    document.body.insertAdjacentHTML('afterbegin', sidebarHTML);
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    /* ── Init ─────────────────────────────────────────────────────────────── */
+    function init() {
+        document.body.classList.add('has-sidebar');
+        document.body.insertAdjacentHTML('afterbegin', sidebarHTML);
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-    // Avatar del usuario logueado
-    const username = sessionStorage.getItem('username');
-    if (username) {
-      fetch('/profile/' + encodeURIComponent(username))
-        .then(r => r.json())
-        .then(d => {
-          if (d.avatar_url) {
-            const img = document.getElementById('sidebar-avatar-img');
-            if (img) img.src = d.avatar_url + '?t=' + Date.now();
-          }
-          // Guardar is_adult si el servidor lo devuelve
-          if (d.is_adult !== undefined) {
-            sessionStorage.setItem('isAdult', d.is_adult);
-          }
-        })
-        .catch(() => { });
+        // Avatar del usuario logueado
+        const username = sessionStorage.getItem('username');
+        if (username) {
+            fetch('/profile/' + encodeURIComponent(username))
+                .then(r => r.json())
+                .then(d => {
+                    if (d.avatar_url) {
+                        const img = document.getElementById('sidebar-avatar-img');
+                        if (img) img.src = d.avatar_url + '?t=' + Date.now();
+                    }
+                    // Guardar is_adult si el servidor lo devuelve
+                    if (d.is_adult !== undefined) {
+                        sessionStorage.setItem('isAdult', d.is_adult);
+                        if (d.is_adult) {
+                            const row = document.getElementById('nsfw-settings-row');
+                            if (row) row.style.display = 'flex';
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+        // NSFW row desde sessionStorage
+        const isAdult = sessionStorage.getItem('isAdult') === 'true';
+        if (isAdult) {
+            const row = document.getElementById('nsfw-settings-row');
+            if (row) row.style.display = 'flex';
+        }
+
+        // Configuración: abrir/cerrar modal
+        document.getElementById('sb-settings').addEventListener('click', openSettings);
+        document.getElementById('settings-modal-close').addEventListener('click', closeSettings);
+        document.getElementById('settings-modal-overlay').addEventListener('click', e => {
+            if (e.target.id === 'settings-modal-overlay') closeSettings();
+        });
+
+        // Dark mode
+        const darkToggle = document.getElementById('toggle-dark-mode');
+        const savedDark = localStorage.getItem('darkMode');
+        const isDark = savedDark === null ? true : savedDark === 'true';
+        darkToggle.checked = isDark;
+        applyDark(isDark);
+        darkToggle.addEventListener('change', () => {
+            localStorage.setItem('darkMode', darkToggle.checked);
+            applyDark(darkToggle.checked);
+        });
+
+        // NSFW mode
+        const nsfwToggle = document.getElementById('toggle-nsfw');
+        const savedNsfw = localStorage.getItem('nsfwMode') === 'true';
+        nsfwToggle.checked = savedNsfw;
+        applyNsfw(savedNsfw);
+        nsfwToggle.addEventListener('change', () => {
+            localStorage.setItem('nsfwMode', nsfwToggle.checked);
+            applyNsfw(nsfwToggle.checked);
+        });
+
+        // Botón crear publicación
+        document.getElementById('sb-create').addEventListener('click', () => {
+            if (!sessionStorage.getItem('username')) {
+                window.location.href = 'login.html'; return;
+            }
+            if (typeof abrirModalPublicar === 'function') {
+                abrirModalPublicar();
+            } else {
+                window.location.href = '/';
+            }
+        });
+
+        // Explorar → scroll/focus en buscador
+        document.getElementById('sb-explore').addEventListener('click', () => {
+            const buscador = document.getElementById('busqueda');
+            if (buscador) { buscador.focus(); buscador.scrollIntoView({ behavior: 'smooth' }); }
+            else window.location.href = '/';
+        });
+
+        // Logout
+        document.getElementById('sb-logout-btn').addEventListener('click', () => {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        });
     }
 
-    // Configuración: abrir/cerrar modal
-    document.getElementById('sb-settings').addEventListener('click', openSettings);
-    document.getElementById('settings-modal-close').addEventListener('click', closeSettings);
-    document.getElementById('settings-modal-overlay').addEventListener('click', e => {
-      if (e.target.id === 'settings-modal-overlay') closeSettings();
-    });
+    function openSettings()  { document.getElementById('settings-modal-overlay').classList.add('open'); }
+    function closeSettings() { document.getElementById('settings-modal-overlay').classList.remove('open'); }
+    function applyDark(v)    { v ? document.documentElement.removeAttribute('data-theme') : document.documentElement.setAttribute('data-theme','light'); }
+    function applyNsfw(v)    { document.documentElement.classList.toggle('nsfw-enabled', v); }
 
-    // Dark mode
-    const darkToggle = document.getElementById('toggle-dark-mode');
-    const savedDark = localStorage.getItem('darkMode');
-    const isDark = savedDark === null ? true : savedDark === 'true';
-    darkToggle.checked = isDark;
-    applyDark(isDark);
-    darkToggle.addEventListener('change', () => {
-      localStorage.setItem('darkMode', darkToggle.checked);
-      applyDark(darkToggle.checked);
-    });
+    // Exponer para uso externo
+    window.openSettingsModal  = openSettings;
+    window.closeSettingsModal = closeSettings;
 
-    // NSFW mode
-    const nsfwToggle = document.getElementById('toggle-nsfw');
-    const savedNsfw = localStorage.getItem('nsfwMode') === 'true';
-    nsfwToggle.checked = savedNsfw;
-    applyNsfw(savedNsfw);
-    nsfwToggle.addEventListener('change', () => {
-      localStorage.setItem('nsfwMode', nsfwToggle.checked);
-      applyNsfw(nsfwToggle.checked);
-    });
-
-    const isAdult = sessionStorage.getItem('isAdult') === 'true';
-
-    if (!isAdult) {
-      nsfwToggle.disabled = true;
-
-      nsfwToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-
-        mostrarMensaje(
-          'Acceso restringido',
-          'Debes tener al menos 18 años para activar contenido para adultos.'
-        );
-      });
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
-
-
-    // Botón crear publicación
-    document.getElementById('sb-create').addEventListener('click', () => {
-      if (!sessionStorage.getItem('username')) {
-        window.location.href = 'login.html'; return;
-      }
-      if (typeof abrirModalPublicar === 'function') {
-        abrirModalPublicar();
-      } else {
-        window.location.href = '/';
-      }
-    });
-
-    // Explorar → scroll/focus en buscador
-    document.getElementById('sb-explore').addEventListener('click', () => {
-      const buscador = document.getElementById('busqueda');
-      if (buscador) { buscador.focus(); buscador.scrollIntoView({ behavior: 'smooth' }); }
-      else window.location.href = '/';
-    });
-
-    // Logout
-    document.getElementById('sb-logout-btn').addEventListener('click', () => {
-      sessionStorage.clear();
-      window.location.href = 'login.html';
-    });
-  }
-
-  function openSettings() { document.getElementById('settings-modal-overlay').classList.add('open'); }
-  function closeSettings() { document.getElementById('settings-modal-overlay').classList.remove('open'); }
-  function applyDark(v) { v ? document.documentElement.removeAttribute('data-theme') : document.documentElement.setAttribute('data-theme', 'light'); }
-  function applyNsfw(v) { document.documentElement.classList.toggle('nsfw-enabled', v); }
-
-  // Exponer para uso externo
-  window.openSettingsModal = openSettings;
-  window.closeSettingsModal = closeSettings;
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
 })();

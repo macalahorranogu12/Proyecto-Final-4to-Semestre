@@ -244,3 +244,22 @@ def get_following(username: str):
                 except Exception:
                     pass
         return result
+    
+@router.get("/follow/status")
+def follow_status(follower: str, following: str):
+
+    with Session(engine) as session:
+
+        follower_user = get_user_by_username(session, follower)
+        following_user = get_user_by_username(session, following)
+
+        existing = session.exec(
+            select(Follow).where(
+                Follow.follower_id == follower_user.id,
+                Follow.following_id == following_user.id
+            )
+        ).first()
+
+        return {
+            "following": existing is not None
+        }
