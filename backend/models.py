@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 from sqlmodel import SQLModel, Field, create_engine
+from datetime import date
 
 engine = create_engine("sqlite:///database.db")
 
@@ -13,7 +14,6 @@ class User(SQLModel, table=True):
 
 
 class UserProfile(SQLModel, table=True):
-    """Perfil extendido del usuario: foto de perfil, bio y datos extra."""
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id", unique=True)
     avatar_path: str | None = Field(default=None)
@@ -76,6 +76,7 @@ def _migrate():
     from sqlalchemy import text
     migrations = [
         "ALTER TABLE userprofile ADD COLUMN is_adult INTEGER DEFAULT 0",
+        "ALTER TABLE userprofile ADD COLUMN birth_date TEXT",
         "ALTER TABLE post RENAME COLUMN image_path TO s3_key",
     ]
     with engine.connect() as conn:

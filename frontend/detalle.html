@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,45 +13,134 @@
             gap: 10px;
             margin-bottom: 18px;
         }
+
         .action-bar-btn {
-            display: flex; align-items: center; gap: 7px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
             padding: 10px 20px;
             border-radius: 24px;
             border: 2px solid transparent;
-            font-size: 14px; font-weight: 700;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
         }
+
         .like-action-btn {
-            background: rgba(239,68,68,0.1);
-            border-color: rgba(239,68,68,0.35);
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.35);
             color: #f87171;
         }
+
         .like-action-btn:hover,
         .like-action-btn.liked {
             background: #e60023;
             border-color: #e60023;
             color: white;
         }
+
         .save-action-btn {
-            background: rgba(123,44,191,0.1);
-            border-color: rgba(123,44,191,0.35);
+            background: rgba(123, 44, 191, 0.1);
+            border-color: rgba(123, 44, 191, 0.35);
             color: #c77dff;
         }
+
         .save-action-btn:hover,
         .save-action-btn.saved {
             background: #7b2cbf;
             border-color: #7b2cbf;
             color: white;
         }
-        .action-bar-btn svg { width: 17px; height: 17px; }
-        .comentario-fecha { font-size: 11px; color: #777; margin-top: 3px; }
+
+        .action-bar-btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .comentario-fecha {
+            font-size: 11px;
+            color: #777;
+            margin-top: 3px;
+        }
+
+        .delete-action-btn {
+            background: rgba(255, 70, 110, .08);
+            border-color: rgba(255, 70, 110, .25);
+            color: #ff7ba3;
+        }
+
+        .delete-action-btn:hover {
+            background: #c9184a;
+            border-color: #ff4d6d;
+            color: white;
+        }
+
+        .delete-modal {
+            display: none;
+        }
+
+        .delete-modal.open {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, .65);
+            z-index: 9999;
+        }
+
+        .delete-card {
+            width: 380px;
+            background: #141414;
+            border: 1px solid #7b2cbf;
+            border-radius: 22px;
+            padding: 28px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(123, 44, 191, .35);
+        }
+
+        .delete-card h3 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .delete-card p {
+            color: #bbb;
+        }
+
+        .delete-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .delete-actions button {
+            flex: 1;
+            border: none;
+            border-radius: 14px;
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        .delete-cancel {
+            background: #252525;
+            color: white;
+        }
+
+        .delete-confirm {
+            background: #c9184a;
+            color: white;
+        }
     </style>
 </head>
+
 <body>
     <header class="header">
         <div class="logo">
-            <a href="index.html" style="text-decoration:none;color:inherit;"><h1>Piterest</h1></a>
+            <a href="index.html" style="text-decoration:none;color:inherit;">
+                <h1>Piterest</h1>
+            </a>
         </div>
         <div class="nav">
             <a href="index.html">← Volver al inicio</a>
@@ -67,25 +157,32 @@
                 <h2 id="detalle-titulo">Cargando...</h2>
             </div>
 
-            <!-- Barra de acciones: like + guardar -->
             <div class="action-bar">
                 <button class="action-bar-btn like-action-btn" id="btn-like" onclick="toggleLike()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
                     <span id="like-label">Me gusta</span>
-                    <span id="like-count" style="opacity:.8;">(0)</span>
+                    <span id="like-count">(0)</span>
                 </button>
+
                 <button class="action-bar-btn save-action-btn" id="btn-save" onclick="toggleSave()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                     </svg>
                     <span id="save-label">Guardar</span>
+                </button>
+
+                <button class="action-bar-btn delete-action-btn" id="btn-delete" onclick="eliminarPost()"
+                    style="display:none;">
+                    🗑 Eliminar
                 </button>
             </div>
 
             <div class="usuario-info">
-                <img id="detalle-avatar" src="avatar.png" alt="Foto de usuario" class="avatar-usuario" width="45" height="45">
+                <img id="detalle-avatar" src="avatar.png" alt="Foto de usuario" class="avatar-usuario" width="45"
+                    height="45">
                 <div class="usuario-texto">
                     <p class="nombre-usuario" id="detalle-username">@usuario</p>
                     <p class="fecha-publicacion" id="detalle-fecha">Publicado recientemente</p>
@@ -96,7 +193,6 @@
             <p class="descripcion" id="detalle-descripcion"></p>
             <hr class="divisor">
 
-            <!-- Comentarios -->
             <div class="comentarios-seccion">
                 <h3>Comentarios</h3>
                 <div class="comentarios-lista" id="comentarios-lista">
@@ -104,16 +200,38 @@
                 </div>
                 <div class="agregar-comentario">
                     <img src="avatar.png" alt="Tu avatar" class="avatar-comentario" id="avatar-comentario-input">
-                    <input type="text" id="input-comentario" placeholder="Añade un comentario..." class="input-comentario">
+                    <input type="text" id="input-comentario" placeholder="Añade un comentario..."
+                        class="input-comentario">
                     <button class="enviar-btn" id="btn-enviar-comentario">Enviar</button>
                 </div>
             </div>
         </div>
     </main>
 
+    <div class="delete-modal" id="delete-modal">
+        <div class="delete-card">
+            <h3>¿Eliminar publicación?</h3>
+            <p>Esta acción eliminará la publicación y su imagen.</p>
+            <div class="delete-actions">
+                <button class="delete-cancel" onclick="cerrarEliminar()">Cancelar</button>
+                <button class="delete-confirm" id="delete-confirm">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    <div class="delete-modal" id="message-modal">
+        <div class="delete-card">
+            <h3 id="message-title">Mensaje</h3>
+            <p id="message-text"></p>
+
+            <div class="delete-actions">
+                <button class="delete-confirm" onclick="cerrarMensaje()">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
     <script>
-        const API = '';
-        let postId   = null;
+        let postId = null;
         let username = sessionStorage.getItem('username');
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -123,7 +241,10 @@
             const post = JSON.parse(raw);
             postId = post.id;
 
-            // Imagen y título
+            if (username && post.username === username) {
+                document.getElementById('btn-delete').style.display = 'flex';
+            }
+
             const imgEl = document.getElementById('detalle-img');
             imgEl.src = post.image_url;
             imgEl.alt = post.title;
@@ -131,48 +252,41 @@
             document.getElementById('detalle-titulo').textContent = post.title;
             document.getElementById('detalle-username').textContent = '@' + post.username;
 
-            // Descripción
             const descEl = document.getElementById('detalle-descripcion');
             descEl.textContent = post.description || '';
             descEl.style.display = post.description ? 'block' : 'none';
 
-            // Categoría
             const catEl = document.getElementById('detalle-categoria');
             if (post.category) { catEl.textContent = post.category; catEl.style.display = 'inline-block'; }
 
-            // Fecha
             if (post.created_at) {
                 const fecha = new Date(post.created_at);
                 document.getElementById('detalle-fecha').textContent =
-                    'Publicado el ' + fecha.toLocaleDateString('es-ES', { year:'numeric', month:'long', day:'numeric' });
+                    'Publicado el ' + fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             }
 
-            // Avatars
             cargarAvatarAutor(post.username);
             if (username) cargarAvatarPropio(username);
 
-            // Cargar estado like/save y comentarios
             if (postId) {
                 cargarLikes();
                 cargarSaved();
                 cargarComentarios();
             }
 
-            // Ocultar botones si no hay sesión
             if (!username) {
                 document.getElementById('btn-like').title = 'Inicia sesión para dar like';
                 document.getElementById('btn-save').title = 'Inicia sesión para guardar';
             }
         });
 
-        // ── Avatars ──────────────────────────────────────────────────────────
         async function cargarAvatarAutor(uname) {
             try {
                 const res = await fetch('/profile/' + encodeURIComponent(uname));
                 if (!res.ok) return;
                 const data = await res.json();
                 if (data.avatar_url) document.getElementById('detalle-avatar').src = data.avatar_url + '?t=' + Date.now();
-            } catch(e) {}
+            } catch (e) { }
         }
         async function cargarAvatarPropio(uname) {
             try {
@@ -180,17 +294,16 @@
                 if (!res.ok) return;
                 const data = await res.json();
                 if (data.avatar_url) document.getElementById('avatar-comentario-input').src = data.avatar_url + '?t=' + Date.now();
-            } catch(e) {}
+            } catch (e) { }
         }
 
-        // ── Likes ─────────────────────────────────────────────────────────────
         async function cargarLikes() {
             try {
                 const url = `/posts/${postId}/likes` + (username ? `?username=${encodeURIComponent(username)}` : '');
                 const res = await fetch(url);
                 const data = await res.json();
                 actualizarBtnLike(data.liked, data.count);
-            } catch(e) {}
+            } catch (e) { }
         }
 
         function actualizarBtnLike(liked, count) {
@@ -203,7 +316,7 @@
 
         async function toggleLike() {
             if (!username) { window.location.href = 'login.html'; return; }
-            const btn   = document.getElementById('btn-like');
+            const btn = document.getElementById('btn-like');
             const liked = btn.classList.contains('liked');
             try {
                 let res;
@@ -212,23 +325,22 @@
                 } else {
                     res = await fetch(`/posts/${postId}/like`, {
                         method: 'POST',
-                        headers: {'Content-Type':'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username })
                     });
                 }
                 const data = await res.json();
                 actualizarBtnLike(data.liked, data.count);
-            } catch(e) {}
+            } catch (e) { }
         }
 
-        // ── Saves ─────────────────────────────────────────────────────────────
         async function cargarSaved() {
             if (!username) return;
             try {
-                const res  = await fetch(`/posts/${postId}/saved?username=${encodeURIComponent(username)}`);
+                const res = await fetch(`/posts/${postId}/saved?username=${encodeURIComponent(username)}`);
                 const data = await res.json();
                 actualizarBtnSave(data.saved);
-            } catch(e) {}
+            } catch (e) { }
         }
 
         function actualizarBtnSave(saved) {
@@ -240,7 +352,7 @@
 
         async function toggleSave() {
             if (!username) { window.location.href = 'login.html'; return; }
-            const btn   = document.getElementById('btn-save');
+            const btn = document.getElementById('btn-save');
             const saved = btn.classList.contains('saved');
             try {
                 let res;
@@ -249,22 +361,21 @@
                 } else {
                     res = await fetch(`/posts/${postId}/save`, {
                         method: 'POST',
-                        headers: {'Content-Type':'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username })
                     });
                 }
                 const data = await res.json();
                 actualizarBtnSave(data.saved);
-            } catch(e) {}
+            } catch (e) { }
         }
 
-        // ── Comentarios ───────────────────────────────────────────────────────
         async function cargarComentarios() {
             try {
-                const res      = await fetch(`/posts/${postId}/comments`);
+                const res = await fetch(`/posts/${postId}/comments`);
                 const comments = await res.json();
                 renderComentarios(comments);
-            } catch(e) {
+            } catch (e) {
                 document.getElementById('comentarios-lista').innerHTML =
                     '<p style="color:#666;font-size:14px;text-align:center;padding:20px 0;">No se pudieron cargar los comentarios.</p>';
             }
@@ -277,12 +388,10 @@
                 return;
             }
             lista.innerHTML = comments.map(c => {
-                const fecha = new Date(c.created_at).toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' });
+                const fecha = new Date(c.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
                 return `
                 <div class="comentario fade-in-up">
-                    <img src="avatar.png" alt="Avatar" class="avatar-comentario"
-                         onerror="this.src='avatar.png'"
-                         data-username="${c.username}">
+                    <img src="avatar.png" alt="Avatar" class="avatar-comentario" onerror="this.src='avatar.png'" data-username="${c.username}">
                     <div class="comentario-contenido">
                         <strong>@${c.username}</strong>
                         <p>${c.content}</p>
@@ -291,18 +400,17 @@
                 </div>`;
             }).join('');
 
-            // Intentar cargar avatares de los comentarios
             lista.querySelectorAll('img[data-username]').forEach(img => {
                 fetch('/profile/' + encodeURIComponent(img.dataset.username))
                     .then(r => r.json())
                     .then(d => { if (d.avatar_url) img.src = d.avatar_url; })
-                    .catch(() => {});
+                    .catch(() => { });
             });
         }
 
         async function enviarComentario() {
             if (!username) { alert('Debes iniciar sesión para comentar.'); return; }
-            const input   = document.getElementById('input-comentario');
+            const input = document.getElementById('input-comentario');
             const content = input.value.trim();
             if (!content) return;
 
@@ -311,13 +419,13 @@
             try {
                 const res = await fetch(`/posts/${postId}/comments`, {
                     method: 'POST',
-                    headers: {'Content-Type':'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, content })
                 });
                 if (!res.ok) throw new Error();
                 input.value = '';
                 await cargarComentarios();
-            } catch(e) {
+            } catch (e) {
                 alert('Error al enviar el comentario.');
             } finally {
                 btn.disabled = false;
@@ -328,9 +436,67 @@
         document.getElementById('input-comentario').addEventListener('keydown', e => {
             if (e.key === 'Enter') enviarComentario();
         });
-    </script>
 
-    <!-- Sidebar -->
+        function eliminarPost() {
+            document.getElementById('delete-modal').classList.add('open');
+        }
+
+        function cerrarEliminar() {
+            document.getElementById('delete-modal').classList.remove('open');
+        }
+
+        function mostrarMensaje(titulo, texto) {
+            document.getElementById('message-title').textContent = titulo;
+            document.getElementById('message-text').textContent = texto;
+
+            document.getElementById('message-modal').classList.add('open');
+        }
+
+        function cerrarMensaje() {
+            document.getElementById('message-modal').classList.remove('open');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('delete-confirm').addEventListener('click', async () => {
+                try {
+
+                    const res = await fetch(
+                        `/posts/${postId}?username=${encodeURIComponent(username)}`,
+                        {
+                            method: 'DELETE'
+                        }
+                    );
+
+                    if (!res.ok) {
+                        throw new Error('No se pudo eliminar');
+                    }
+
+                    cerrarEliminar();
+
+                    mostrarMensaje(
+                        'Publicación eliminada',
+                        'La publicación fue eliminada correctamente.'
+                    );
+
+                    setTimeout(() => {
+                        window.location.href = 'usuario.html';
+                    }, 1500);
+
+                } catch {
+
+                    cerrarEliminar();
+
+                    mostrarMensaje(
+                        'Error',
+                        'No se pudo eliminar la publicación.'
+                    );
+
+                }
+            });
+        });
+
+    </script>
     <script src="/sidebar.js"></script>
 </body>
+
 </html>

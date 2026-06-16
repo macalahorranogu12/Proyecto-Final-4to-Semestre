@@ -67,3 +67,16 @@ def generate_presigned_get_url(key: str, expiration: int = 3600) -> str:
         return url
     except Exception as e:
         raise Exception(f"Error generando presigned GET URL: {str(e)}")
+
+def delete_s3_file(key: str):
+    """
+    Elimina un archivo del bucket S3.
+    """
+    try:
+        s3_client.delete_object(
+            Bucket=S3_BUCKET,
+            Key=key
+        )
+        return True
+    except Exception as e:
+        raise Exception(f"Error eliminando archivo S3: {str(e)}")

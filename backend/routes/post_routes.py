@@ -1,13 +1,17 @@
 import os
 import shutil
 from datetime import datetime
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException,Query
 from sqlmodel import Session, select, func
 
 from models import engine, Post, Comment, Like, Save
 from schemas import CommentCreate, LikeAction, SaveAction, UploadUrlRequest, UploadUrlResponse, RegisterPostRequest, RegisterPostResponse
 from utils.helpers import validate_image, get_user_by_username
-from utils.s3_utils import generate_presigned_url, generate_presigned_get_url
+from utils.s3_utils import (
+    generate_presigned_url,
+    generate_presigned_get_url,
+    delete_s3_file
+)
 
 router = APIRouter()
 UPLOAD_DIR = "uploads"
@@ -268,3 +272,72 @@ def unsave_post(post_id: int, username: str):
             session.delete(existing)
             session.commit()
         return {"saved": False}
+    
+# ─── Delete Post ───────────────────────────────────────────────
+
+@router.delete("/posts/{post_id}")
+def delete_post(post_id: int, username: str = Query(...)):
+
+    with Session(engine) as session:
+
+        post = session.get(Post, post_id)
+
+        if not post:
+            raise HTTPException(
+                status_code=404,
+                detail="Publicación no encontrada"
+            )
+
+        user = get_user_by_username(session, username)
+
+        if post.user_id != user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="No puedes eliminar esta publicación"
+            )
+
+        try:
+
+            # ─── borrar imagen en S3/local ───
+            if post.s3_key:
+                delete_s3_file(post.s3_key)
+
+            # ─── borrar comentarios ───
+            comments = session.exec(
+                select(Comment).where(Comment.post_id == post_id)
+            ).all()
+
+            for c in comments:
+                session.delete(c)
+
+            # ─── borrar likes ───
+            likes = session.exec(
+                select(Like).where(Like.post_id == post_id)
+            ).all()
+
+            for l in likes:
+                session.delete(l)
+
+            # ─── borrar saves ───
+            saves = session.exec(
+                select(Save).where(Save.post_id == post_id)
+            ).all()
+
+            for s in saves:
+                session.delete(s)
+
+            # ─── borrar post ───
+            session.delete(post)
+            session.commit()
+
+            return {
+                "success": True,
+                "message": "Publicación eliminada"
+            }
+
+        except Exception as e:
+            session.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=str(e)
+            )
